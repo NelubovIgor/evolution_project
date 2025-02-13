@@ -1,167 +1,91 @@
-import pygame
-import random
-import math
+import pygame, sys, random
 
-# Настройки окна
-WIDTH, HEIGHT = 800, 600
-FPS = 30
+WIDTH = 800
+HIGHT = 600
+FPS = 60
 
-# Цвета
-WHITE = (255, 255, 255)
+CELL_SIZE = 2
+
+CYAN = (0, 128, 255)
+BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
-BROWN = (139, 69, 19)
+BLACK = (0, 0, 0)
 
-# Инициализация Pygame
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+class Body:
+    all_bodies = {}
+
+    def __init__(self, x, y, color, birthday):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.birthday = birthday
+        Body.all_bodies[(x, y)] = self
+
+    def clear_body(self):
+        del Body.all_bodies[(self.x, self.y)]
+
+    def random_coordinates():
+        while True:
+            x = random.randint(0, WIDTH)
+            y = random.randint(0, HIGHT)
+            if (x, y) not in Body.all_bodies:
+                return x, y
+
+class Player(Body):
+    def __init__(self, x, y, birthday, color=BLUE):
+        super().__init__(x, y, color, birthday)
+
+    def move_player(self, pressed):
+        if pressed[pygame.K_w]: player1.y -= 3
+        if pressed[pygame.K_s]: player1.y += 3
+        if pressed[pygame.K_a]: player1.x -= 3
+        if pressed[pygame.K_d]: player1.x += 3
+
+class Grass(Body):
+    def __init__(self, x, y, birthday, color=GREEN):
+        super().__init__(x, y, color, birthday)
+
+class Predator(Body):
+    def __init__(self, x, y, birthday, color=RED):
+        super().__init__(x, y, color, birthday)
+
+class Herbivore(Body):
+    def __init__(self, x, y, birthday, color=CYAN):
+        super().__init__(x, y, color, birthday)
+
+pygame.init()  # Инициализация Pygame
+screen = pygame.display.set_mode((WIDTH, HIGHT))  # Создание окна
+cycle = 0
+
+player1 = Player(20, 20, cycle)
+grass = []
+
+for g in range(20):
+    x, y = Body.random_coordinates()
+    grass.append(Grass(x, y, cycle))
+
 clock = pygame.time.Clock()
 
-class Plant:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.energy = 10
-        self.reproduction_time = random.randint(50, 100)
-
-    def update(self):
-        self.reproduction_time -= 1
-        if self.reproduction_time <= 0:
-            self.reproduce()
-            self.reproduction_time = random.randint(50, 100)
-
-    def reproduce(self):
-        # Создание нового растения в случайном радиусе
-        new_x = self.x + random.randint(-50, 50)
-        new_y = self.y + random.randint(-50, 50)
-        if 0 <= new_x < WIDTH and 0 <= new_y < HEIGHT:
-            plants.append(Plant(new_x, new_y))
-
-    def draw(self):
-        pygame.draw.circle(screen, GREEN, (self.x, self.y), 5)
-
-class Herbivore:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.energy = 50
-        self.speed = 2
-        self.reproduction_energy = 100
-
-    def update(self):
-        self.energy -= 0.1
-        if self.energy <= 0:
-            herbivores.remove(self)
-            return
-
-        # Поиск ближайшего растения
-        nearest_plant = None
-        min_distance = float('inf')
-        for plant in plants:
-            distance = math.hypot(self.x - plant.x, self.y - plant.y)
-            if distance < min_distance:
-                min_distance = distance
-                nearest_plant = plant
-
-        # Движение к растению
-        if nearest_plant:
-            angle = math.atan2(nearest_plant.y - self.y, nearest_plant.x - self.x)
-            self.x += self.speed * math.cos(angle)
-            self.y += self.speed * math.sin(angle)
-
-            # Поедание растения
-            if min_distance < 10:
-                self.energy += 20
-                plants.remove(nearest_plant)
-
-        # Размножение
-        if self.energy >= self.reproduction_energy:
-            self.energy /= 2
-            herbivores.append(Herbivore(self.x + random.randint(-20, 20), self.y + random.randint(-20, 20)))
-
-        # Избегание хищников
-        for predator in predators:
-            distance = math.hypot(self.x - predator.x, self.y - predator.y)
-            if distance < 50:  # Если хищник близко, убегаем
-                angle = math.atan2(self.y - predator.y, self.x - predator.x)
-                self.x += self.speed * math.cos(angle)
-                self.y += self.speed * math.sin(angle)
-
-    def draw(self):
-        pygame.draw.circle(screen, BROWN, (self.x, self.y), 8)
-
-class Predator:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.energy = 50
-        self.speed = 3
-        self.reproduction_energy = 100
-
-    def update(self):
-        self.energy -= 0.2
-        if self.energy <= 0:
-            predators.remove(self)
-            return
-
-        # Поиск ближайшего травоядного
-        nearest_herbivore = None
-        min_distance = float('inf')
-        for herbivore in herbivores:
-            distance = math.hypot(self.x - herbivore.x, self.y - herbivore.y)
-            if distance < min_distance:
-                min_distance = distance
-                nearest_herbivore = herbivore
-
-        # Движение к травоядному
-        if nearest_herbivore:
-            angle = math.atan2(nearest_herbivore.y - self.y, nearest_herbivore.x - self.x)
-            self.x += self.speed * math.cos(angle)
-            self.y += self.speed * math.sin(angle)
-
-            # Поедание травоядного
-            if min_distance < 10:
-                self.energy += 30
-                herbivores.remove(nearest_herbivore)
-
-        # Размножение
-        if self.energy >= self.reproduction_energy:
-            self.energy /= 2
-            predators.append(Predator(self.x + random.randint(-20, 20), self.y + random.randint(-20, 20)))
-
-    def draw(self):
-        pygame.draw.circle(screen, RED, (self.x, self.y), 10)
-
-
-# Создание начальной популяции
-plants = [Plant(random.randint(0, WIDTH), random.randint(0, HEIGHT)) for _ in range(20)]
-herbivores = [Herbivore(random.randint(0, WIDTH), random.randint(0, HEIGHT)) for _ in range(10)]
-predators = [Predator(random.randint(0, WIDTH), random.randint(0, HEIGHT)) for _ in range(5)]
-
-# Основной цикл
-running = True
-while running:
-    screen.fill(WHITE)
-
+while True:
+    cycle += 1
     # Обработка событий
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    for e in pygame.event.get():
+        if e.type == pygame.QUIT:
+            sys.exit()
 
-    # Обновление и отрисовка
-    for plant in plants:
-        plant.update()
-        plant.draw()
+    pressed = pygame.key.get_pressed()
+    if pressed:
+        Player.move_player(player1, pressed)
 
-    for herbivore in herbivores:
-        herbivore.update()
-        herbivore.draw()
+    #отрисовка
+    screen.fill(BLACK)
 
-    for predator in predators:
-        predator.update()
-        predator.draw()
+    for g in grass:
+        rect = pygame.Rect(g.x, g.y, CELL_SIZE, CELL_SIZE)
+        pygame.draw.rect(screen, g.color, rect)
+
+    pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, CELL_SIZE, CELL_SIZE))
 
     pygame.display.flip()
     clock.tick(FPS)
-
-pygame.quit()
