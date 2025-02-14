@@ -2,9 +2,9 @@ import pygame, sys, random
 
 WIDTH = 800
 HIGHT = 600
-FPS = 60
+FPS = 30
 
-CELL_SIZE = 2
+CELL_SIZE = 3
 
 CYAN = (0, 128, 255)
 BLUE = (0, 0, 255)
