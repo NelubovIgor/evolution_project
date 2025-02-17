@@ -1,3 +1,4 @@
 d="эта строчка, чтоб я когда-нибудь получил работу"
 g="newrowforwork"
-print(d, g)
+c = "hello"
+print(d, g, c)
