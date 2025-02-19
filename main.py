@@ -2,9 +2,11 @@ import pygame, sys, random
 
 WIDTH = 800
 HIGHT = 600
+SIDEBAR_WIDTH = 200
+
 FPS = 30
 
-CELL_SIZE = 3
+CELL_SIZE = 2
 
 CYAN = (0, 128, 255)
 BLUE = (0, 0, 255)
@@ -37,10 +39,11 @@ class Player(Body):
         super().__init__(x, y, color, birthday)
 
     def move_player(self, pressed):
-        if pressed[pygame.K_w]: player1.y -= 3
-        if pressed[pygame.K_s]: player1.y += 3
-        if pressed[pygame.K_a]: player1.x -= 3
-        if pressed[pygame.K_d]: player1.x += 3
+        speed = 1
+        if pressed[pygame.K_w]: self.y -= speed
+        if pressed[pygame.K_s]: self.y += speed
+        if pressed[pygame.K_a]: self.x -= speed
+        if pressed[pygame.K_d]: self.x += speed
 
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN):
@@ -55,7 +58,7 @@ class Herbivore(Body):
         super().__init__(x, y, color, birthday)
 
 pygame.init()  # Инициализация Pygame
-screen = pygame.display.set_mode((WIDTH, HIGHT))  # Создание окна
+screen = pygame.display.set_mode((WIDTH + SIDEBAR_WIDTH, HIGHT))  # Создание окна
 cycle = 0
 
 player1 = Player(20, 20, cycle)
@@ -88,4 +91,5 @@ while True:
     pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, CELL_SIZE, CELL_SIZE))
 
     pygame.display.flip()
+
     clock.tick(FPS)
