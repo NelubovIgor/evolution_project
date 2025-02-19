@@ -1,7 +1,7 @@
 import pygame, sys, random
 
 WIDTH = 800
-HIGHT = 600
+HEIGHT = 600
 SIDEBAR_WIDTH = 200
 
 FPS = 30
@@ -13,6 +13,7 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
 class Body:
     all_bodies = {}
@@ -30,7 +31,7 @@ class Body:
     def random_coordinates():
         while True:
             x = random.randint(0, WIDTH)
-            y = random.randint(0, HIGHT)
+            y = random.randint(0, HEIGHT)
             if (x, y) not in Body.all_bodies:
                 return x, y
 
@@ -58,7 +59,7 @@ class Herbivore(Body):
         super().__init__(x, y, color, birthday)
 
 pygame.init()  # Инициализация Pygame
-screen = pygame.display.set_mode((WIDTH + SIDEBAR_WIDTH, HIGHT))  # Создание окна
+screen = pygame.display.set_mode((WIDTH + SIDEBAR_WIDTH, HEIGHT))  # Создание окна
 cycle = 0
 
 player1 = Player(20, 20, cycle)
@@ -89,6 +90,13 @@ while True:
         pygame.draw.rect(screen, g.color, rect)
 
     pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, CELL_SIZE, CELL_SIZE))
+
+    pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
+    font = pygame.font.SysFont("Arial", 18)
+
+    # Отображение количества циклов
+    cycle_text = font.render(f"Цикл: {cycle}", True, WHITE)
+    screen.blit(cycle_text, (810, 20))
 
     pygame.display.flip()
 
