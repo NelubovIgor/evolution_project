@@ -25,6 +25,10 @@ class Body:
         self.birthday = birthday
         Body.all_bodies[(x, y)] = self
 
+    def update_coordinates(self, new_crd):
+        Body.clear_body(self)
+        Body.all_bodies[new_crd] = self
+
     def clear_body(self):
         del Body.all_bodies[(self.x, self.y)]
 
@@ -34,6 +38,9 @@ class Body:
             y = random.randint(0, HEIGHT)
             if (x, y) not in Body.all_bodies:
                 return x, y
+            
+    def collision(self):
+        pass
 
 class Player(Body):
     def __init__(self, x, y, birthday, color=BLUE):
@@ -41,10 +48,18 @@ class Player(Body):
 
     def move_player(self, pressed):
         speed = 1
-        if pressed[pygame.K_w]: self.y -= speed
-        if pressed[pygame.K_s]: self.y += speed
-        if pressed[pygame.K_a]: self.x -= speed
-        if pressed[pygame.K_d]: self.x += speed
+        if pressed[pygame.K_w]:
+            Body.update_coordinates(self, (self.x, self.y - speed))
+            self.y -= speed
+        if pressed[pygame.K_s]:
+            Body.update_coordinates(self, (self.x, self.y + speed))
+            self.y += speed
+        if pressed[pygame.K_a]:
+            Body.update_coordinates(self, (self.x - speed, self.y))
+            self.x -= speed
+        if pressed[pygame.K_d]:
+            Body.update_coordinates(self, (self.x + speed, self.y))
+            self.x += speed
 
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN):
@@ -71,18 +86,22 @@ for g in range(20):
 
 clock = pygame.time.Clock()
 
-play = True
+paused = False
 
-while play:
-    cycle += 1
+while True:
     # Обработка событий
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             sys.exit()
 
     pressed = pygame.key.get_pressed()
-    if pressed:
+    if not pressed[pygame.K_SPACE]:
         Player.move_player(player1, pressed)
+    else:
+        paused = not paused
+
+    if not paused:
+        cycle += 1
 
     #отрисовка
     screen.fill(BLACK)
@@ -99,6 +118,10 @@ while play:
     font = pygame.font.SysFont("Arial", 18)
     cycle_text = font.render(f"Цикл: {cycle}", True, WHITE)
     screen.blit(cycle_text, (810, 20))
+
+    #координаты игрока
+    coordinates = font.render(f"Координаты: х-{player1.x},у-{player1.y}", True, WHITE)
+    screen.blit(coordinates, (810, 40))
 
     pygame.display.flip()
 
