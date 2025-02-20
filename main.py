@@ -71,7 +71,9 @@ for g in range(20):
 
 clock = pygame.time.Clock()
 
-while True:
+play = True
+
+while play:
     cycle += 1
     # Обработка событий
     for e in pygame.event.get():
@@ -92,9 +94,9 @@ while True:
     pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, CELL_SIZE, CELL_SIZE))
 
     pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
-    font = pygame.font.SysFont("Arial", 18)
 
     # Отображение количества циклов
+    font = pygame.font.SysFont("Arial", 18)
     cycle_text = font.render(f"Цикл: {cycle}", True, WHITE)
     screen.blit(cycle_text, (810, 20))
 
