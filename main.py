@@ -18,11 +18,13 @@ WHITE = (255, 255, 255)
 class Body:
     all_bodies = {}
 
-    def __init__(self, x, y, color, birthday):
+    def __init__(self, x, y, color, birthday, energy, size):
         self.x = x
         self.y = y
         self.color = color
         self.birthday = birthday
+        self.energy = energy
+        self.size = size
         Body.all_bodies[(x, y)] = self
 
     def update_coordinates(self, new_crd):
@@ -75,14 +77,18 @@ class Herbivore(Body):
 
 pygame.init()  # Инициализация Pygame
 screen = pygame.display.set_mode((WIDTH + SIDEBAR_WIDTH, HEIGHT))  # Создание окна
+
 cycle = 0
 
+# создание объектов
 player1 = Player(20, 20, cycle)
 grass = []
 
 for g in range(20):
     x, y = Body.random_coordinates()
     grass.append(Grass(x, y, cycle))
+
+
 
 clock = pygame.time.Clock()
 
