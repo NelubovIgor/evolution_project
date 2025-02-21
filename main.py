@@ -6,7 +6,7 @@ SIDEBAR_WIDTH = 200
 
 FPS = 30
 
-CELL_SIZE = 2
+CELL_SIZE = 1
 
 CYAN = (0, 128, 255)
 BLUE = (0, 0, 255)
@@ -18,7 +18,7 @@ WHITE = (255, 255, 255)
 class Body:
     all_bodies = {}
 
-    def __init__(self, x, y, color, birthday, energy, size):
+    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE):
         self.x = x
         self.y = y
         self.color = color
@@ -64,8 +64,8 @@ class Player(Body):
             self.x += speed
 
 class Grass(Body):
-    def __init__(self, x, y, birthday, color=GREEN):
-        super().__init__(x, y, color, birthday)
+    def __init__(self, x, y, birthday, color=GREEN, size=CELL_SIZE):
+        super().__init__(x, y, color, birthday, size)
 
 class Predator(Body):
     def __init__(self, x, y, birthday, color=RED):
@@ -113,10 +113,10 @@ while True:
     screen.fill(BLACK)
 
     for g in grass:
-        rect = pygame.Rect(g.x, g.y, CELL_SIZE, CELL_SIZE)
+        rect = pygame.Rect(g.x, g.y, g.size, g.size)
         pygame.draw.rect(screen, g.color, rect)
 
-    pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, CELL_SIZE, CELL_SIZE))
+    pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, player1.size, player1.size))
 
     pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
 
@@ -126,7 +126,7 @@ while True:
     screen.blit(cycle_text, (810, 20))
 
     #координаты игрока
-    coordinates = font.render(f"Координаты: х-{player1.x},у-{player1.y}", True, WHITE)
+    coordinates = font.render(f"Координаты: х {player1.x},у {player1.y}", True, WHITE)
     screen.blit(coordinates, (810, 40))
 
     pygame.display.flip()
