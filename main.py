@@ -82,13 +82,21 @@ cycle = 0
 
 # создание объектов
 player1 = Player(20, 20, cycle)
-grass = []
+grass_list = []
+herbivore_list = []
+predator_list = []
 
 for g in range(20):
     x, y = Body.random_coordinates()
-    grass.append(Grass(x, y, cycle))
+    grass_list.append(Grass(x, y, cycle))
 
+for h in range(5):
+    x, y = Body.random_coordinates()
+    herbivore_list.append(Herbivore(x, y, cycle))
 
+for p in range(5):
+    x, y = Body.random_coordinates()
+    predator_list.append(Predator(x, y, cycle))
 
 clock = pygame.time.Clock()
 
@@ -112,9 +120,17 @@ while True:
     #отрисовка
     screen.fill(BLACK)
 
-    for g in grass:
+    for g in grass_list:
         rect = pygame.Rect(g.x, g.y, g.size, g.size)
         pygame.draw.rect(screen, g.color, rect)
+
+    for h in herbivore_list:
+        rect = pygame.Rect(h.x, h.y, h.size, h.size)
+        pygame.draw.rect(screen, h.color, rect)
+
+    for p in predator_list:
+        rect = pygame.Rect(p.x, p.y, p.size, p.size)
+        pygame.draw.rect(screen, p.color, rect)
 
     pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, player1.size, player1.size))
 
