@@ -48,18 +48,15 @@ while True:
     screen.fill(BLACK)
 
     for g in grass_list:
-        rect = pygame.Rect(g.x, g.y, g.size, g.size)
-        pygame.draw.rect(screen, g.color, rect)
+        pygame.draw.circle(screen, g.color, (g.x, g.y), g.size)
 
     for h in herbivore_list:
-        rect = pygame.Rect(h.x, h.y, h.size, h.size)
-        pygame.draw.rect(screen, h.color, rect)
+        pygame.draw.circle(screen, h.color, (h.x, h.y), h.size)
 
     for p in predator_list:
-        rect = pygame.Rect(p.x, p.y, p.size, p.size)
-        pygame.draw.rect(screen, p.color, rect)
+        pygame.draw.circle(screen, p.color, (p.x, p.y), p.size)
 
-    pygame.draw.rect(screen, player1.color, pygame.Rect(player1.x, player1.y, player1.size, player1.size))
+    pygame.draw.circle(screen, player1.color, (player1.x, player1.y), player1.size)
 
     pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
 
