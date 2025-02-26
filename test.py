@@ -1,13 +1,16 @@
-import re
+author = ''
+book = ''
+flag = "YES"
 
-text = "Hello, my name is [u-1061][u-1072][u-1082][u-1080]!"
+for _ in range(int(input())):
+    string = input()
+    a = string[:string.find(" ")]
+    b = string[string.rfind(" "):]
+    if author >= a and book >= b:
+        author = a
+        book = b
+    else:
+        flag = "NO"
+        break
 
-while True:
-    indx = text.find('[u-')
-    if indx == -1: break
-    print(text[0:indx])
-    print(chr(int(text[indx+3:indx+7])))
-    print(text[indx+8:])
-    text = text[0:indx] + chr(int(text[indx+3:indx+7])) + text[indx+8:]
-
-print(text)
+print(flag)
