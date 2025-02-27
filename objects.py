@@ -15,9 +15,11 @@ class Body:
         self.visible = visible
         Body.all_bodies[(x, y)] = self
 
-    def update_coordinates(self, new_crd):
+    def update_coordinates(self, new_crd):       
+        # print("old coord: ", self.x, self.y)
         Body.clear_body(self)
         Body.all_bodies[new_crd] = self
+        # print("new coord: ", self.x, self.y, new_crd)
 
     def touch(self):
         pass
@@ -30,6 +32,7 @@ class Body:
 
     def clear_body(self):
         if (self.x, self.y) in Body.all_bodies:
+            # print(Body.all_bodies)
             del Body.all_bodies[(self.x, self.y)]
 
     def random_coordinates():
@@ -42,10 +45,15 @@ class Body:
     def collision(self):
         # res = []
         for obj in Body.all_bodies.keys():
-            distance = math.hypot(self.x - obj[0], self.y - obj[1])
-            if distance < (self.size + Body.all_bodies[obj].size):
-                Body.clear_body(Body.all_bodies[obj])
-                break
+            # print(obj, self, sep='\n')
+            if obj != (self.x, self.y):
+                distance = math.hypot(self.x - obj[0], self.y - obj[1])
+                if distance < (self.size + Body.all_bodies[obj].size):
+                    # print(Body.all_bodies[obj])
+                    grass_list.remove(Body.all_bodies[obj])
+                    Body.clear_body(Body.all_bodies[obj])
+
+                    break
 
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN):
@@ -66,15 +74,42 @@ class Player(Body):
     def move_player(self, pressed):
         speed = 1
         if pressed[pygame.K_w]:
-            Body.update_coordinates(self, (self.x, self.y - speed))
+            self.update_coordinates((self.x, self.y - speed))
             self.y -= speed
         if pressed[pygame.K_s]:
-            Body.update_coordinates(self, (self.x, self.y + speed))
+            self.update_coordinates((self.x, self.y + speed))
             self.y += speed
         if pressed[pygame.K_a]:
-            Body.update_coordinates(self, (self.x - speed, self.y))
+            self.update_coordinates((self.x - speed, self.y))
             self.x -= speed
         if pressed[pygame.K_d]:
-            Body.update_coordinates(self, (self.x + speed, self.y))
+            self.update_coordinates((self.x + speed, self.y))
             self.x += speed
-        Body.collision(self)
+        self.collision()
+
+cycle = 0
+
+# создание объектов
+player1 = Player(20, 20, cycle)
+
+grass_list = []
+herbivore_list = []
+predator_list = []
+
+grass_list.append(Grass(40, 40, cycle))
+
+def make_objects():
+    for g in range(20):
+        x, y = Body.random_coordinates()
+        grass_list.append(Grass(x, y, cycle))
+
+    for h in range(5):
+        x, y = Body.random_coordinates()
+        herbivore_list.append(Herbivore(x, y, cycle))
+
+    for p in range(5):
+        x, y = Body.random_coordinates()
+        predator_list.append(Predator(x, y, cycle))
+
+
+# make_objects()

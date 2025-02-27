@@ -5,26 +5,6 @@ from objects import *
 pygame.init()  # Инициализация Pygame
 screen = pygame.display.set_mode((WIDTH + SIDEBAR_WIDTH, HEIGHT))  # Создание окна
 
-cycle = 0
-
-# создание объектов
-player1 = Player(20, 20, cycle)
-grass_list = []
-herbivore_list = []
-predator_list = []
-
-for g in range(20):
-    x, y = Body.random_coordinates()
-    grass_list.append(Grass(x, y, cycle))
-
-for h in range(5):
-    x, y = Body.random_coordinates()
-    herbivore_list.append(Herbivore(x, y, cycle))
-
-for p in range(5):
-    x, y = Body.random_coordinates()
-    predator_list.append(Predator(x, y, cycle))
-
 clock = pygame.time.Clock()
 
 paused = False
@@ -57,6 +37,7 @@ while True:
         pygame.draw.circle(screen, p.color, (p.x, p.y), p.size)
 
     pygame.draw.circle(screen, player1.color, (player1.x, player1.y), player1.size)
+    
 
     pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
 
