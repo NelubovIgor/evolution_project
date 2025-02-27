@@ -1,16 +1,11 @@
-author = ''
-book = ''
-flag = "YES"
+from contextlib import contextmanager
 
-for _ in range(int(input())):
-    string = input()
-    a = string[:string.find(" ")]
-    b = string[string.rfind(" "):]
-    if author >= a and book >= b:
-        author = a
-        book = b
-    else:
-        flag = "NO"
-        break
-
-print(flag)
+@contextmanager
+def context_manager():
+    try:
+        yield 'ContextManager'
+    except IndexError:
+        print('Исключение IndexError обработано')
+    
+with context_manager() as manager:
+    print(manager[100])
