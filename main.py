@@ -1,5 +1,5 @@
 import pygame, sys
-from constatnts import *
+from constants import *
 from objects import *
 
 pygame.init()  # Инициализация Pygame

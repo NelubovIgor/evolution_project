@@ -1,9 +1,115 @@
-import random, pygame, math
-from constatnts import *
+import random
+import pygame
+import math
+from constants import *
 
+class Rectangle:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+    def contains(self, point):
+        px, py = point
+        return (self.x <= px <= self.x + self.width and
+                self.y <= py <= self.y + self.height)
+
+    def intersects(self, other):
+        return not (other.x > self.x + self.width or
+                   other.x + other.width < self.x or
+                   other.y > self.y + self.height or
+                   other.y + other.height < self.y)
+
+class Quadtree:
+    def __init__(self, boundary, capacity):
+        self.boundary = boundary
+        self.capacity = capacity
+        self.objects = []
+        self.divided = False
+        self.northeast = None
+        self.northwest = None
+        self.southeast = None
+        self.southwest = None
+
+    def subdivide(self):
+        x, y, w, h = self.boundary.x, self.boundary.y, self.boundary.width, self.boundary.height
+        half_w, half_h = w / 2, h / 2
+
+        ne = Rectangle(x + half_w, y, half_w, half_h)
+        self.northeast = Quadtree(ne, self.capacity)
+        nw = Rectangle(x, y, half_w, half_h)
+        self.northwest = Quadtree(nw, self.capacity)
+        se = Rectangle(x + half_w, y + half_h, half_w, half_h)
+        self.southeast = Quadtree(se, self.capacity)
+        sw = Rectangle(x, y + half_h, half_w, half_h)
+        self.southwest = Quadtree(sw, self.capacity)
+
+        self.divided = True
+
+    def insert(self, obj):
+        if not self.boundary.contains((obj.x, obj.y)):
+            return False
+
+        if len(self.objects) < self.capacity:
+            self.objects.append(obj)
+            return True
+
+        if not self.divided:
+            self.subdivide()
+
+        if self.northeast.insert(obj):
+            return True
+        if self.northwest.insert(obj):
+            return True
+        if self.southeast.insert(obj):
+            return True
+        if self.southwest.insert(obj):
+            return True
+
+        return False
+
+    def query(self, range, found=None):
+        if found is None:
+            found = []
+
+        if not self.boundary.intersects(range):
+            return found
+
+        for obj in self.objects:
+            if range.contains((obj.x, obj.y)):
+                found.append(obj)
+
+        if self.divided:
+            self.northeast.query(range, found)
+            self.northwest.query(range, found)
+            self.southeast.query(range, found)
+            self.southwest.query(range, found)
+
+        return found
+    
+    def remove(self, obj):
+        """Удаляет объект из квадродерева."""
+        if obj in self.objects:
+            self.objects.remove(obj)
+            return True
+
+        if self.divided:
+            if self.northeast.remove(obj):
+                return True
+            if self.northwest.remove(obj):
+                return True
+            if self.southeast.remove(obj):
+                return True
+            if self.southwest.remove(obj):
+                return True
+
+        return False
+    
+# Глобальная переменная для квадродерева
+quadtree = Quadtree(Rectangle(0, 0, WIDTH, HEIGHT), capacity=4)
 
 class Body:
-    all_bodies = {}
 
     def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=3):
         self.x = x
@@ -13,39 +119,29 @@ class Body:
         self.energy = energy
         self.size = size
         self.visible = visible
-        Body.all_bodies[(x, y)] = self
+        quadtree.insert(self)
 
     def update_coordinates(self, new_crd):
-        Body.clear_body(self)
-        Body.all_bodies[new_crd] = self
-
-    def touch(self):
-        pass
-
-    def vision(self):
-        pass
-
-    def move(self):
-        pass
+        quadtree.remove(self)
+        self.x, self.y = new_crd
+        quadtree.insert(self)
 
     def clear_body(self):
-        if (self.x, self.y) in Body.all_bodies:
-            del Body.all_bodies[(self.x, self.y)]
+        quadtree.remove(self)
+
+    def collision(self):
+        range = Rectangle(self.x - self.size, self.y - self.size, self.size * 2, self.size * 2)
+        nearby_objects = quadtree.query(range)
+        for obj in nearby_objects:
+            if obj != self and math.hypot(self.x - obj.x, self.y - obj.y) < (self.size + obj.size):
+                print(f"Коллизия между {self.__class__.__name__} и {obj.__class__.__name__}")
+                break
 
     def random_coordinates():
         while True:
             x = random.randint(0, WIDTH)
             y = random.randint(0, HEIGHT)
-            if (x, y) not in Body.all_bodies:
-                return x, y
-            
-    def collision(self):
-        # res = []
-        for obj in Body.all_bodies.keys():
-            distance = math.hypot(self.x - obj[0], self.y - obj[1])
-            if distance < (self.size + Body.all_bodies[obj].size):
-                Body.clear_body(Body.all_bodies[obj])
-                break
+            return (x, y)
 
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN):
@@ -66,15 +162,11 @@ class Player(Body):
     def move_player(self, pressed):
         speed = 1
         if pressed[pygame.K_w]:
-            Body.update_coordinates(self, (self.x, self.y - speed))
-            self.y -= speed
+            self.update_coordinates((self.x, self.y - speed))
         if pressed[pygame.K_s]:
-            Body.update_coordinates(self, (self.x, self.y + speed))
-            self.y += speed
+            self.update_coordinates((self.x, self.y + speed))
         if pressed[pygame.K_a]:
-            Body.update_coordinates(self, (self.x - speed, self.y))
-            self.x -= speed
+            self.update_coordinates((self.x - speed, self.y))
         if pressed[pygame.K_d]:
-            Body.update_coordinates(self, (self.x + speed, self.y))
-            self.x += speed
-        Body.collision(self)
+            self.update_coordinates((self.x + speed, self.y))
+        self.collision()
