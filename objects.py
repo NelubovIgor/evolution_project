@@ -1,5 +1,5 @@
 import random, pygame, math
-from constatnts import *
+from constants import *
 
 
 class Body:
