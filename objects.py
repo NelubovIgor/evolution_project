@@ -22,7 +22,15 @@ class Body:
         # print("new coord: ", self.x, self.y, new_crd)
 
     def touch(self):
-        pass
+        nw = (-1, -1)
+        w = (-1, 0)
+        sw = (-1, 1)
+        s = (0, 1)
+        se = (1, 1)
+        e = (1, 0)
+        ne = (1, -1)
+        n = (0, -1)
+
 
     def vision(self):
         pass
@@ -49,10 +57,16 @@ class Body:
             if obj != (self.x, self.y):
                 distance = math.hypot(self.x - obj[0], self.y - obj[1])
                 if distance < (self.size + Body.all_bodies[obj].size):
-                    # print(Body.all_bodies[obj])
-                    grass_list.remove(Body.all_bodies[obj])
+                    # print(Body.all_bodies[obj].__class__.__name__)
+                    body_obj = Body.all_bodies[obj]
+                    name = body_obj.__class__.__name__ 
+                    if name == "Grass":
+                        grass_list.remove(body_obj)
+                    elif name == "Herbivore":
+                        herbivore_list.remove(body_obj)
+                    elif name == "Predator":
+                        predator_list.remove(body_obj)
                     Body.clear_body(Body.all_bodies[obj])
-
                     break
 
 class Grass(Body):
@@ -96,7 +110,9 @@ grass_list = []
 herbivore_list = []
 predator_list = []
 
-grass_list.append(Grass(40, 40, cycle))
+
+
+grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
 
 def make_objects():
     for g in range(20):
