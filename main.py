@@ -23,6 +23,7 @@ while True:
 
     if not paused:
         cycle += 1
+        # grow()
 
     #отрисовка
     screen.fill(BLACK)

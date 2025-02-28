@@ -22,15 +22,16 @@ class Body:
         # print("new coord: ", self.x, self.y, new_crd)
 
     def touch(self):
-        nw = (-1, -1)
-        w = (-1, 0)
-        sw = (-1, 1)
-        s = (0, 1)
-        se = (1, 1)
-        e = (1, 0)
-        ne = (1, -1)
-        n = (0, -1)
-
+        dir = DIRECTIONS
+        def clean_border(direct):
+            return {key: value for key, value in dir if direct not in key}
+        if self.x == 0: dir = clean_border("n")
+        if self.y == 0: dir = clean_border("w")
+        if self.x == WIDTH - 1: dir = clean_border("e")
+        if self.y == HEIGHT - 1: dir = clean_border("s")
+        results = [tuple(a + b for a, b in zip((self.x, self.y), t)) for t in dir.values()]
+        objects_touch = [r for r in results if r in Body.all_bodies]
+        return objects_touch
 
     def vision(self):
         pass
@@ -51,23 +52,25 @@ class Body:
                 return x, y
             
     def collision(self):
-        # res = []
-        for obj in Body.all_bodies.keys():
-            # print(obj, self, sep='\n')
-            if obj != (self.x, self.y):
-                distance = math.hypot(self.x - obj[0], self.y - obj[1])
-                if distance < (self.size + Body.all_bodies[obj].size):
-                    # print(Body.all_bodies[obj].__class__.__name__)
-                    body_obj = Body.all_bodies[obj]
-                    name = body_obj.__class__.__name__ 
-                    if name == "Grass":
-                        grass_list.remove(body_obj)
-                    elif name == "Herbivore":
-                        herbivore_list.remove(body_obj)
-                    elif name == "Predator":
-                        predator_list.remove(body_obj)
-                    Body.clear_body(Body.all_bodies[obj])
-                    break
+        around = Body.touch(self)
+        if around:
+            print(around)
+            for obj in Body.all_bodies.keys():
+                # print(obj, self, sep='\n')
+                if obj != (self.x, self.y):
+                    distance = math.hypot(self.x - obj[0], self.y - obj[1])
+                    if distance < (self.size + Body.all_bodies[obj].size):
+                        # print(Body.all_bodies[obj].__class__.__name__)
+                        body_obj = Body.all_bodies[obj]
+                        name = body_obj.__class__.__name__ 
+                        if name == "Grass":
+                            grass_list.remove(body_obj)
+                        elif name == "Herbivore":
+                            herbivore_list.remove(body_obj)
+                        elif name == "Predator":
+                            predator_list.remove(body_obj)
+                        Body.clear_body(Body.all_bodies[obj])
+                        break
 
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN):
@@ -98,7 +101,7 @@ class Player(Body):
             self.x -= speed
         if pressed[pygame.K_d]:
             self.update_coordinates((self.x + speed, self.y))
-            self.x += speed
+            self.x += speed    
         self.collision()
 
 cycle = 0
@@ -110,9 +113,9 @@ grass_list = []
 herbivore_list = []
 predator_list = []
 
-
-
-grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
+def grow():
+    while not grass_list:
+        grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
 
 def make_objects():
     for g in range(20):
@@ -128,4 +131,4 @@ def make_objects():
         predator_list.append(Predator(x, y, cycle))
 
 
-# make_objects()
+make_objects()
