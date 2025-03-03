@@ -37,9 +37,9 @@ class Body:
                 direction = []
                 self.move(direction)
             else:
-                direction = []
+                direction = (grasses[0].x, grasses[0].y)
                 self.move(direction)
-        pass
+        return
 
     def touch(self):
         dir = DIRECTIONS
