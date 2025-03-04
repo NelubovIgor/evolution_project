@@ -39,7 +39,7 @@ class Body:
             else:
                 direction = (grasses[0].x, grasses[0].y)
                 self.move(direction)
-        return
+        return "тревога, уйди!"
 
     def touch(self):
         dir = DIRECTIONS
