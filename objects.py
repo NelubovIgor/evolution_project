@@ -36,10 +36,13 @@ class Body:
             elif herbivores:
                 direction = []
                 self.move(direction)
-            else:
+            elif grasses:
                 direction = (grasses[0].x, grasses[0].y)
                 self.move(direction)
-        return "тревога, уйди!"
+            else:
+                direction = []
+                self.move(direction)
+        
 
     def touch(self):
         dir = DIRECTIONS
