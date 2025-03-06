@@ -59,7 +59,8 @@ class Body:
     def vision(self):
         pass
 
-    def move(self, direction):
+    def move(self, direction, to_target=True):
+
         pass
 
     def clear_body(self):

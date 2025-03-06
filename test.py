@@ -1,1 +1,6 @@
-print((6, 4) + (1, 0))
+class MyClass:
+    pass
+
+
+print(isinstance(MyClass(), object))
+print(isinstance(MyClass, object))
