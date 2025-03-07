@@ -18,6 +18,8 @@ while True:
     pressed = pygame.key.get_pressed()
     if not pressed[pygame.K_SPACE]:
         Player.move_player(player1, pressed)
+        for h in herbivore_list:
+            Body.do(h)
     else:
         paused = not paused
 

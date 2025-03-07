@@ -13,6 +13,7 @@ class Body:
         self.energy = energy
         self.size = size
         self.visible = visible
+        
         Body.all_bodies[(x, y)] = self
 
     def update_coordinates(self, new_crd):       
@@ -23,45 +24,77 @@ class Body:
 
     def do(self):
         self.energy -= 0.1
-        obj = self.touch()
+        # obj = self.touch()
+        touch = self.vision()
+        if not touch:
+            obj = self.vision(self.visible)
         if not obj:
-            self.vision()
+            self.sleep()
+            return
+
+        predators = [o for o in obj if o.__class__.__name__ == "Predator"]
+        herbivores = [o for o in obj if o.__class__.__name__ == "Herbivore"]
+        grasses = [o for o in obj if o.__class__.__name__ == "Grass"]
+        if predators:
+            self.move(random.choice(predators), False)
+        elif herbivores:
+            self.move(random.choice(herbivores), False)
+        elif grasses:
+            self.move(random.choice(herbivores))
         else:
-            predators = [o for o in obj if o.__class__.__name__ == "Predator"]
-            herbivores = [o for o in obj if o.__class__.__name__ == "Herbivore"]
-            grasses = [o for o in obj if o.__class__.__name__ == "Grass"]
-            if predators:
-                direction = []
-                self.move(direction)
-            elif herbivores:
-                direction = []
-                self.move(direction)
-            elif grasses:
-                direction = (grasses[0].x, grasses[0].y)
-                self.move(direction)
-            else:
-                direction = []
-                self.move(direction)
+            self.move(tuple(a + b for a, b in zip(random.choice(DIRECTIONS.values()), (self.x, self.y))))
         
-
-    def touch(self):
-        dir = DIRECTIONS
-        def clean_border(direct):
-            return {key: value for key, value in dir if direct not in key}
-        if self.x == 0: dir = clean_border("n")
-        if self.y == 0: dir = clean_border("w")
-        if self.x == WIDTH - 1: dir = clean_border("e")
-        if self.y == HEIGHT - 1: dir = clean_border("s")
-        results = [tuple(a + b for a, b in zip((self.x, self.y), t)) for t in dir.values()]
-        objects_touch = [r for r in results if r in Body.all_bodies]
-        return objects_touch
-
-    def vision(self):
+    def sleep(self):
         pass
+
+    # def borders(self):
+    #     dir = DIRECTIONS
+    #     def clean_border(direct):
+    #         return {key: value for key, value in dir if direct not in key}
+    #     if self.x == 0: dir = clean_border("n")
+    #     if self.y == 0: dir = clean_border("w")
+    #     if self.x == WIDTH - 1: dir = clean_border("e")
+    #     if self.y == HEIGHT - 1: dir = clean_border("s")
+
+    # def touch(self):
+    #     direction = self.borders()
+    #     results = [tuple(a + b for a, b in zip((self.x, self.y), t)) for t in direction.values()]
+    #     objects_touch = [r for r in results if r in Body.all_bodies]
+    #     return objects_touch
+
+    def vision(self, visible=1):
+        objects = []
+
+        x_min = int(self.x - visible)
+        x_max = int(self.x + visible) 
+        y_min = int(self.y - visible)
+        y_max = int(self.y + visible)
+
+        # Проходим по всем точкам в области
+        for x in range(x_min, x_max):
+            for y in range(y_min, y_max):
+                if 0 < x < WIDTH or 0 < y < HEIGHT:
+                    pass
+                if (x - self.x) ** 2 + (y - self.y) ** 2 <= visible ** 2:
+                    if (x, y) in Body.all_bodies:
+                        objects.append(Body.all_bodies[(x, y)])
+
 
     def move(self, direction, to_target=True):
+        dx = direction - self.x
+        dy = direction - self.y
 
-        pass
+
+        direction_x = 0 if dx == 0 else dx // abs(dx)
+        direction_y = 0 if dy == 0 else dy // abs(dy)
+
+        if to_target:
+            self.x += direction_x
+            self.y += direction_y
+        else:
+            self.x -= direction_x
+            self.y -= direction_y
+        self.collision()
 
     def clear_body(self):
         if (self.x, self.y) in Body.all_bodies:
@@ -74,9 +107,9 @@ class Body:
             y = random.randint(0, HEIGHT)
             if (x, y) not in Body.all_bodies:
                 return x, y
-            
+
     def collision(self):
-        around = Body.touch(self)
+        around = self.vision()
         if around:
             print(around)
             for obj in Body.all_bodies.keys():
@@ -137,7 +170,7 @@ grass_list = []
 herbivore_list = []
 predator_list = []
 
-
+grass_list.append(Grass(12, 12, cycle))
 
 def grow():
     while not grass_list:
@@ -158,5 +191,7 @@ def make_objects():
 
 
 make_objects()
+
+print(Body.all_bodies[(12, 12)])
 
 # print(grass_list[0].__class__.__name__)
