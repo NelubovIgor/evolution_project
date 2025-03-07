@@ -29,7 +29,7 @@ class Body:
         if not touch:
             obj = self.vision(self.visible)
         if not obj:
-            self.sleep()
+            self.move(tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y))))
             return
 
         predators = [o for o in obj if o.__class__.__name__ == "Predator"]
@@ -42,7 +42,8 @@ class Body:
         elif grasses:
             self.move(random.choice(herbivores))
         else:
-            self.move(tuple(a + b for a, b in zip(random.choice(DIRECTIONS.values()), (self.x, self.y))))
+            self.sleep()
+            return
         
     def sleep(self):
         pass
@@ -81,8 +82,8 @@ class Body:
 
 
     def move(self, direction, to_target=True):
-        dx = direction - self.x
-        dy = direction - self.y
+        dx = direction[0] - self.x
+        dy = direction[1] - self.y
 
 
         direction_x = 0 if dx == 0 else dx // abs(dx)

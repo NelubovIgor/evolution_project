@@ -1,6 +1,4 @@
-class MyClass:
-    pass
+import random
+from constants import *
 
-
-print(isinstance(MyClass(), object))
-print(isinstance(MyClass, object))
+print(tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (30, 34))))
