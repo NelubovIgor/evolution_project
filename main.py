@@ -50,8 +50,11 @@ while True:
     screen.blit(cycle_text, (810, 20))
 
     #координаты игрока
-    coordinates = font.render(f"Координаты: х {player1.x},у {player1.y}", True, WHITE)
+    coordinates = font.render(f"Player: х {player1.x},у {player1.y}", True, WHITE)
     screen.blit(coordinates, (810, 40))
+
+    coordinates_b = font.render(f"Bot: х {herbivore_list[0].x},у {herbivore_list[0].y}", True, WHITE)
+    screen.blit(coordinates_b, (810, 60))
 
     pygame.display.flip()
 

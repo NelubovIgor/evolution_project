@@ -13,6 +13,7 @@ class Body:
         self.energy = energy
         self.size = size
         self.visible = visible
+        self.memory = []
         
         Body.all_bodies[(x, y)] = self
 
@@ -28,9 +29,20 @@ class Body:
         touch = self.vision()
         if not touch:
             obj = self.vision(self.visible)
-        if not obj:
-            self.move(tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y))))
+        if not obj and not self.memory:
+            direction = tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y)))
+            self.move(direction)
             return
+        elif self.memory:
+            if len(self.memory) == 1:
+                self.memory.append(10)
+            self.memory[1] -= 1
+            self.move(None)
+            if self.memory[1] == 0:
+                self.memory.clear()
+            return
+
+        
 
         predators = [o for o in obj if o.__class__.__name__ == "Predator"]
         herbivores = [o for o in obj if o.__class__.__name__ == "Herbivore"]
@@ -82,12 +94,18 @@ class Body:
 
 
     def move(self, direction, to_target=True):
+        if not direction:
+            self.x += self.memory[0][0]
+            self.y += self.memory[0][1]
+            return
         dx = direction[0] - self.x
         dy = direction[1] - self.y
 
 
         direction_x = 0 if dx == 0 else dx // abs(dx)
         direction_y = 0 if dy == 0 else dy // abs(dy)
+
+        self.memory.append((direction_x, direction_y))
 
         if to_target:
             self.x += direction_x
@@ -171,20 +189,20 @@ grass_list = []
 herbivore_list = []
 predator_list = []
 
-grass_list.append(Grass(12, 12, cycle))
-
-def grow():
-    while not grass_list:
-        grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
+# grass_list.append(Grass(12, 12, cycle))
+herbivore_list.append(Herbivore(12, 12, cycle))
+# def grow():
+#     while not grass_list:
+#         grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
 
 def make_objects():
     for g in range(20):
         x, y = Body.random_coordinates()
         grass_list.append(Grass(x, y, cycle))
 
-    for h in range(5):
-        x, y = Body.random_coordinates()
-        herbivore_list.append(Herbivore(x, y, cycle))
+    # for h in range(5):
+    #     x, y = Body.random_coordinates()
+    #     herbivore_list.append(Herbivore(x, y, cycle))
 
     for p in range(5):
         x, y = Body.random_coordinates()
@@ -193,6 +211,6 @@ def make_objects():
 
 make_objects()
 
-print(Body.all_bodies[(12, 12)])
+# print(Body.all_bodies[(12, 12)])
 
 # print(grass_list[0].__class__.__name__)
