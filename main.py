@@ -16,15 +16,18 @@ while True:
             sys.exit()
 
     pressed = pygame.key.get_pressed()
-    if not pressed[pygame.K_SPACE]:
-        Player.move_player(player1, pressed)
-        for h in herbivore_list:
-            Body.do(h)
-    else:
+
+    if pressed[pygame.K_SPACE]:
         paused = not paused
 
     if not paused:
+        Player.move_player(player1, pressed)
         cycle += 1
+        for h in herbivore_list:
+            print("do")
+            Body.do(h)
+
+
         # grow()
 
     #отрисовка
@@ -53,8 +56,12 @@ while True:
     coordinates = font.render(f"Player: х {player1.x},у {player1.y}", True, WHITE)
     screen.blit(coordinates, (810, 40))
 
+
     coordinates_b = font.render(f"Bot: х {herbivore_list[0].x},у {herbivore_list[0].y}", True, WHITE)
     screen.blit(coordinates_b, (810, 60))
+
+    energy_b = font.render(f"Bot energy: {herbivore_list[0].energy}", True, WHITE)
+    screen.blit(energy_b, (810, 80))
 
     pygame.display.flip()
 

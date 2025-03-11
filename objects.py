@@ -29,6 +29,8 @@ class Body:
         touch = self.vision()
         if not touch:
             obj = self.vision(self.visible)
+        else:
+            obj = touch
         if not obj and not self.memory:
             direction = tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y)))
             self.move(direction)
@@ -48,11 +50,14 @@ class Body:
         herbivores = [o for o in obj if o.__class__.__name__ == "Herbivore"]
         grasses = [o for o in obj if o.__class__.__name__ == "Grass"]
         if predators:
-            self.move(random.choice(predators), False)
+            pred = random.choice(predators)
+            self.move((pred.x, pred.y), False)
         elif herbivores:
-            self.move(random.choice(herbivores), False)
+            herb = random.choice(herbivores)
+            self.move((herb.x, herb.y), False)
         elif grasses:
-            self.move(random.choice(herbivores))
+            gras = random.choice(herbivores)
+            self.move((gras.x, gras.y))
         else:
             self.sleep()
             return
@@ -91,15 +96,16 @@ class Body:
                 if (x - self.x) ** 2 + (y - self.y) ** 2 <= visible ** 2:
                     if (x, y) in Body.all_bodies:
                         objects.append(Body.all_bodies[(x, y)])
+        return objects
 
 
-    def move(self, direction, to_target=True):
-        if not direction:
+    def move(self, target, to_target=True):
+        if not target:
             self.x += self.memory[0][0]
             self.y += self.memory[0][1]
             return
-        dx = direction[0] - self.x
-        dy = direction[1] - self.y
+        dx = target[0] - self.x
+        dy = target[1] - self.y
 
 
         direction_x = 0 if dx == 0 else dx // abs(dx)
@@ -113,6 +119,8 @@ class Body:
         else:
             self.x -= direction_x
             self.y -= direction_y
+        if 0 <= self.x <= WIDTH or 0 <= self.y <= HEIGHT:
+            self.memory.clear()
         self.collision()
 
     def clear_body(self):
@@ -130,7 +138,7 @@ class Body:
     def collision(self):
         around = self.vision()
         if around:
-            print(around)
+            # print(around)
             for obj in Body.all_bodies.keys():
                 # print(obj, self, sep='\n')
                 if obj != (self.x, self.y):
@@ -190,7 +198,9 @@ herbivore_list = []
 predator_list = []
 
 # grass_list.append(Grass(12, 12, cycle))
+
 herbivore_list.append(Herbivore(12, 12, cycle))
+
 # def grow():
 #     while not grass_list:
 #         grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
