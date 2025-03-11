@@ -31,6 +31,9 @@ class Body:
             obj = self.vision(self.visible)
         else:
             obj = touch
+        # print("touch: ", touch)
+        # print("obj: ", obj)
+
         if not obj and not self.memory:
             direction = tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y)))
             self.move(direction)
@@ -43,8 +46,6 @@ class Body:
             if self.memory[1] == 0:
                 self.memory.clear()
             return
-
-        
 
         predators = [o for o in obj if o.__class__.__name__ == "Predator"]
         herbivores = [o for o in obj if o.__class__.__name__ == "Herbivore"]
@@ -91,7 +92,8 @@ class Body:
         # Проходим по всем точкам в области
         for x in range(x_min, x_max):
             for y in range(y_min, y_max):
-                if 0 < x < WIDTH or 0 < y < HEIGHT:
+                if (self.x == x and self.y == y) and 0 < x < WIDTH or 0 < y < HEIGHT:
+                    print("pass")
                     pass
                 if (x - self.x) ** 2 + (y - self.y) ** 2 <= visible ** 2:
                     if (x, y) in Body.all_bodies:
