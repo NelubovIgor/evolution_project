@@ -23,12 +23,13 @@ while True:
     if not paused:
         Player.move_player(player1, pressed)
         cycle += 1
+        make_objects()
+        # grow()
         for h in herbivore_list:
             # print("do")
             Body.do(h)
 
 
-        # grow()
 
     #отрисовка
     screen.fill(BLACK)

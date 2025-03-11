@@ -88,15 +88,19 @@ class Body:
         x_max = int(self.x + visible) 
         y_min = int(self.y - visible)
         y_max = int(self.y + visible)
-
+        # print("x ", x_min, x_max)
+        # print("y ", y_min, y_max)
         # Проходим по всем точкам в области
         for x in range(x_min, x_max):
             for y in range(y_min, y_max):
-                if (self.x == x and self.y == y) and 0 < x < WIDTH or 0 < y < HEIGHT:
-                    print("pass")
-                    pass
+                if 0 > x > WIDTH or 0 > y > HEIGHT:
+                    continue
+                if self.x == x and self.y == y:
+                    # print("self")
+                    continue
                 if (x - self.x) ** 2 + (y - self.y) ** 2 <= visible ** 2:
                     if (x, y) in Body.all_bodies:
+                        # print(x, y)
                         objects.append(Body.all_bodies[(x, y)])
         return objects
 
@@ -123,6 +127,7 @@ class Body:
             self.y -= direction_y
         if 0 <= self.x <= WIDTH or 0 <= self.y <= HEIGHT:
             self.memory.clear()
+        self.update_coordinates(target)
         self.collision()
 
     def clear_body(self):
@@ -199,29 +204,29 @@ grass_list = []
 herbivore_list = []
 predator_list = []
 
-# grass_list.append(Grass(12, 12, cycle))
+grass_list.append(Grass(15, 15, cycle))
 
 herbivore_list.append(Herbivore(12, 12, cycle))
 
-# def grow():
-#     while not grass_list:
-#         grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
+def grow():
+    while not grass_list:
+        grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
 
 def make_objects():
     for g in range(20):
         x, y = Body.random_coordinates()
         grass_list.append(Grass(x, y, cycle))
 
-    # for h in range(5):
-    #     x, y = Body.random_coordinates()
-    #     herbivore_list.append(Herbivore(x, y, cycle))
+    for h in range(5):
+        x, y = Body.random_coordinates()
+        herbivore_list.append(Herbivore(x, y, cycle))
 
     for p in range(5):
         x, y = Body.random_coordinates()
         predator_list.append(Predator(x, y, cycle))
 
 
-make_objects()
+
 
 # print(Body.all_bodies[(12, 12)])
 
