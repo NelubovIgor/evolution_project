@@ -5,7 +5,7 @@ from constants import *
 class Body:
     all_bodies = {}
 
-    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=5, mempoint=5):
+    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=10):
         self.x = x
         self.y = y
         self.color = color
@@ -14,7 +14,6 @@ class Body:
         self.size = size
         self.visible = visible
         self.memory = []
-        self.mempoint = mempoint
         
         Body.all_bodies[(x, y)] = self
 
@@ -30,25 +29,23 @@ class Body:
             obj = touch
         # print("touch: ", touch)
         # print("obj: ", obj)
-        # print("1", self.memory)
+
         if not obj and not self.memory:
             direction = tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y)))
             self.move(direction)
             return
         elif self.memory:
-            # print("memory")
             if len(self.memory) == 1:
-                self.memory.append(self.mempoint)
+                self.memory.append(10)
             self.memory[1] -= 1
             self.move(None)
             if self.memory[1] == 0:
                 self.memory.clear()
             return
-        # print("2", self.memory)
+
         predators = [o for o in obj if o.__class__.__name__ == "Predator"]
         herbivores = [o for o in obj if o.__class__.__name__ == "Herbivore"]
         grasses = [o for o in obj if o.__class__.__name__ == "Grass"]
-        # print(grasses)
         if predators:
             pred = random.choice(predators)
             self.move((pred.x, pred.y), False)
@@ -56,7 +53,6 @@ class Body:
             herb = random.choice(herbivores)
             self.move((herb.x, herb.y), False)
         elif grasses:
-            print("see grass")
             gras = random.choice(grasses)
             self.move((gras.x, gras.y))
         else:
@@ -71,7 +67,9 @@ class Body:
         x_max = int(self.x + visible) 
         y_min = int(self.y - visible)
         y_max = int(self.y + visible)
-
+        # print("x ", x_min, x_max)
+        # print("y ", y_min, y_max)
+        # Проходим по всем точкам в области
         for x in range(x_min, x_max):
             for y in range(y_min, y_max):
                 if (0 > x > WIDTH) or (0 > y > HEIGHT):
@@ -110,7 +108,7 @@ class Body:
         else:
             self.x -= direction_x
             self.y -= direction_y
-        if 0 >= self.x > WIDTH or 0 >= self.y > HEIGHT:
+        if 0 <= self.x < WIDTH or 0 <= self.y < HEIGHT:
             self.memory.clear()
         self.update_coordinates(target)
         self.collision()
@@ -144,7 +142,6 @@ class Body:
                         if name == "Grass":
                             grass_list.remove(body_obj)
                         elif name == "Herbivore":
-                            print("herbivore dead")
                             herbivore_list.remove(body_obj)
                         elif name == "Predator":
                             predator_list.remove(body_obj)
@@ -193,29 +190,20 @@ class Player(Body):
 
 cycle = 0
 
-
 # создание объектов
-
+player1 = Player(20, 20, cycle)
 
 grass_list = []
 herbivore_list = []
 predator_list = []
-# player1 = None
 
 # grass_list.append(Grass(15, 15, cycle))
-def tests_obj():
-    grass_list.append(Grass(10, 15, cycle))
-    grass_list.append(Grass(10, 13, cycle))
-    herbivore_list.append(Herbivore(10, 10, cycle))
-    herbivore_list.append(Herbivore(100, 100, cycle))
+grass_list.append(Grass(2, 4, cycle))
+herbivore_list.append(Herbivore(12, 12, cycle))
 
 def grow():
     while not grass_list:
         grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
-
-def make_player():
-
-    return Player(20, 20, cycle)
 
 def make_objects():
     for g in range(20):
