@@ -24,6 +24,7 @@ class Body:
         self.energy -= 0.1
         # obj = self.touch()
         touch = self.vision()
+
         if not touch:
             obj = self.vision(self.visible)
         else:
@@ -115,8 +116,9 @@ class Body:
         self.update_coordinates(target)
         self.collision()
 
+
     def sleep(self):
-        pass
+        return
 
     def clear_body(self):
         if (self.x, self.y) in Body.all_bodies:
