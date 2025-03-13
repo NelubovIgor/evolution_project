@@ -197,7 +197,7 @@ grass_list = []
 herbivore_list = []
 predator_list = []
 
-# grass_list.append(Grass(15, 15, cycle))
+grass_list.append(Grass(15, 15, cycle))
 grass_list.append(Grass(2, 4, cycle))
 herbivore_list.append(Herbivore(12, 12, cycle))
 
