@@ -65,21 +65,6 @@ class Body:
     def sleep(self):
         pass
 
-    # def borders(self):
-    #     dir = DIRECTIONS
-    #     def clean_border(direct):
-    #         return {key: value for key, value in dir if direct not in key}
-    #     if self.x == 0: dir = clean_border("n")
-    #     if self.y == 0: dir = clean_border("w")
-    #     if self.x == WIDTH - 1: dir = clean_border("e")
-    #     if self.y == HEIGHT - 1: dir = clean_border("s")
-
-    # def touch(self):
-    #     direction = self.borders()
-    #     results = [tuple(a + b for a, b in zip((self.x, self.y), t)) for t in direction.values()]
-    #     objects_touch = [r for r in results if r in Body.all_bodies]
-    #     return objects_touch
-
     def vision(self, visible=1):
         objects = []
 
