@@ -24,7 +24,7 @@ while True:
         Player.move_player(player1, pressed)
         cycle += 1
         for h in herbivore_list:
-            print("do")
+            # print("do")
             Body.do(h)
 
 
