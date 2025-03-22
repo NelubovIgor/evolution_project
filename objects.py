@@ -27,6 +27,7 @@ class Body:
         self.energy -= 0.1
         # obj = self.touch()
         touch = self.vision()
+        print(touch)
         if not touch:
             obj = self.vision(self.visible)
         else:
@@ -78,11 +79,12 @@ class Body:
         for x in range(x_min, x_max):
             for y in range(y_min, y_max):
                 if (self.x == x and self.y == y) and 0 < x < WIDTH or 0 < y < HEIGHT:
-                    print("pass")
-                    pass
+                    # print("pass")
+                    continue
                 if (x - self.x) ** 2 + (y - self.y) ** 2 <= visible ** 2:
                     if (x, y) in Body.all_bodies:
                         objects.append(Body.all_bodies[(x, y)])
+        # print(objects)
         return objects
 
 
