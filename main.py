@@ -9,6 +9,8 @@ clock = pygame.time.Clock()
 
 paused = False
 
+# make_objects()
+
 while True:
     # Обработка событий
     for e in pygame.event.get():
@@ -23,9 +25,8 @@ while True:
     if not paused:
         Player.move_player(player1, pressed)
         cycle += 1
-        for h in herbivore_list:
-            # print("do")
-            Body.do(h)
+
+        world.world_life()
 
 
         # grow()
@@ -33,14 +34,8 @@ while True:
     #отрисовка
     screen.fill(BLACK)
 
-    for g in grass_list:
-        pygame.draw.circle(screen, g.color, (g.x, g.y), g.size)
-
-    for h in herbivore_list:
-        pygame.draw.circle(screen, h.color, (h.x, h.y), h.size)
-
-    for p in predator_list:
-        pygame.draw.circle(screen, p.color, (p.x, p.y), p.size)
+    for c, b in world.bodies.items():
+        pygame.draw.circle(screen, b.color, (c[0], c[1]), b.size)
 
     pygame.draw.circle(screen, player1.color, (player1.x, player1.y), player1.size)
     
@@ -57,10 +52,11 @@ while True:
     screen.blit(coordinates, (810, 40))
 
 
-    coordinates_b = font.render(f"Bot: х {herbivore_list[0].x},у {herbivore_list[0].y}", True, WHITE)
+
+    coordinates_b = font.render(f"Bot: х {bot.x},у {bot.y}", True, WHITE)
     screen.blit(coordinates_b, (810, 60))
 
-    energy_b = font.render(f"Bot energy: {herbivore_list[0].energy}", True, WHITE)
+    energy_b = font.render(f"Bot energy: {bot.energy}", True, WHITE)
     screen.blit(energy_b, (810, 80))
 
     pygame.display.flip()

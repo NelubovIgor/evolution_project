@@ -1,13 +1,12 @@
 import random
 from constants import *
 
-class LowerCaseDict(dict):
-    def __setitem__(self, key, value):
-        key = str(key).lower()
-        super().__setitem__(key, value)
+a = 40
+b = 39
 
+# print(b * HEIGHT + a)
+# print(a * HEIGHT + b)
 
-lowercasedict = LowerCaseDict({'ONE': 1})
-lowercasedict.update({'TWO': 2})
+c = 0 if a - b <= 0 else a - b
 
-print(lowercasedict)
+print(c)
