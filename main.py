@@ -28,10 +28,8 @@ while True:
 
         world.world_life()
 
-
-        # grow()
-
     #отрисовка
+    
     screen.fill(BLACK)
 
     for c, b in world.bodies.items():
