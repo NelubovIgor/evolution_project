@@ -9,12 +9,12 @@ class World:
         self.next_id = 0
 
     def world_life(self):
-        copy_world = copy.deepcopy(self.bodies)
-        for coord, obj in self.bodies.items():
+        copy_world = copy.copy(self.bodies)
+        for coord, obj in copy_world.items():
             if isinstance(obj, Animal):
                 obj.do()
             elif isinstance(obj, Grass):
-                pass
+                obj.grow()
 
     def new_body(self, obj):
         obj.id = self.next_id
@@ -32,6 +32,14 @@ class World:
             if (x, y) not in self.bodies:
                 return x, y
             
+    def borders(obj):
+        visible = obj.visible
+        min_x = 0 if obj.x - visible < 0 else obj.x - visible
+        max_x = WIDTH if obj.x + visible > WIDTH else obj.x + visible
+        min_y = 0 if obj.y - visible < 0 else obj.y - visible
+        max_y = HEIGHT if obj.x + visible > HEIGHT else obj.x + visible
+        return min_x, max_x, min_y, max_y
+
     def clear_body(self, obj):
         del self.bodies[(obj.x, obj.y)]
         del self.id_to_coords[obj.id]
@@ -40,14 +48,15 @@ class World:
         self.clear_body(old_obj)
         self.add_body(obj)
 
-    def collision(self):
-        pass
+    def collision(self, obj, target):
+        distance = math.hypot((target.x - obj.x) ** 2 + (target.y - obj.y) ** 2)
+        radius_sum = obj.size + target.size
 
+        if distance <= radius_sum:
+            self.clear_body(target)
 
 class Body:
-    objects_around = []
-    
-    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=3):
+    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=20):
         self.x = x
         self.y = y
         self.color = color
@@ -58,38 +67,22 @@ class Body:
         self.memory = []
         self.id = None
 
-
     def vision(self, visible=1):
         objects_around = []
 
-        min_x = 0 if self.x - visible < 0 else self.x - visible
-        max_x = WIDTH if self.x + visible > WIDTH else self.x + visible
-        min_y = 0 if self.y - visible < 0 else self.y - visible
-        max_y = HEIGHT if self.x + visible > HEIGHT else self.x + visible
+        min_x, max_x, min_y, max_y = World.borders(self)
 
-        for x in range(min_x, max_x):
-            for y in range(min_y, max_y):
-                if not (x == self.x and y == self.y) and (x, y) in world.bodies:
-                    obj = copy.copy(world.bodies[(x, y)])
-                    objects_around.append(obj)
-
-        print(objects_around, self.__class__.__name__, self.id)
+        for x in range(min_x, max_x + 1):
+            for y in range(min_y, max_y + 1):
+                if x == self.x and y == self.y:
+                    continue
+                if (x, y) in world.bodies:
+                    objects_around.append(world.bodies[(x, y)])
         return objects_around
     
-    def do(self):
-        self.energy -= 0.1
-
-        touch = self.vision()
-        print(touch)
-        if not touch:
-            obj = self.vision(self.visible)
-        else:
-            obj = touch
-
-    def move(self, target, to_target=True):
-        pass
-
-    def reproduction():
+    def reproduction(self, place):
+        self.energy /= 2
+        type_obj = self.__class__.__name__
         pass
 
     def sleep(self):
@@ -99,9 +92,54 @@ class Animal(Body):
     def __init__(self, x, y, birthday, color):
         super().__init__(x, y, birthday, color)
 
+    def do(self):
+        self.energy -= 0.1
+
+        obj = self.vision()
+        if not obj:
+            obj = self.vision(self.visible)
+        if not obj:
+            self.sleep()
+            return
+        
+        self.move(obj[0])
+        
+    def move(self, target, to_target=True):
+        copy_obj = copy.copy(self)
+        dir_x = target.x - self.x
+        dir_y = target.y - self.y
+
+        if dir_x != 0:
+            to_x = int(dir_x / dir_x) if dir_x > 0 else int((dir_x / dir_x) * -1)
+        else:
+            to_x = 0
+
+        if dir_y != 0:
+            to_y = int(dir_y / dir_y) if dir_y > 0 else int((dir_y / dir_y) * -1)
+        else:
+            to_y = 0
+
+        self.x += to_x
+        self.y += to_y
+
+        world.collision(self, target)
+        world.update_coordinates(self, copy_obj)
+
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN):
         super().__init__(x, y, color, birthday)
+
+    def grow(self):
+        self.energy += 1
+
+        if self.energy >= 100:
+            min_x, max_x, min_y, max_y = World.borders(self)
+            while True:
+                x = random.randint(min_x, max_x)
+                y = random.randint(min_y, max_y)
+                if (x, y) not in world.bodies:
+                    self.reproduction((x, y))
+
 
 class Predator(Animal):
     def __init__(self, x, y, birthday, color=RED):
@@ -140,14 +178,26 @@ if play:
 else:
     player1 = None
 
-food = (Grass(21, 20, cycle))
+# food = (Grass(20, 21, cycle))
+# world.new_body(food)
+
+food1 = (Grass(21, 20, cycle))
+world.new_body(food1)
+
+# food2 = (Grass(21, 21, cycle))
+# world.new_body(food2)
+
+food = (Grass(34, 20, cycle))
 world.new_body(food)
 
-# food = (Grass(34, 20, cycle))
-# world.add_body(food)
+food3 = (Grass(44, 20, cycle))
+world.new_body(food3)
+
+food4 = (Grass(54, 20, cycle))
+world.new_body(food4)
 
 # bot = (Herbivore(20, 20, cycle))
-# world.add_body(bot)
+# world.new_body(bot)
 
 bot = (Herbivore(20, 20, cycle))
 world.new_body(bot)

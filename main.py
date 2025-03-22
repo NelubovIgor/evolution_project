@@ -51,9 +51,9 @@ while True:
         coordinates = font.render(f"Player: х {player1.x},у {player1.y}", True, WHITE)
         screen.blit(coordinates, (810, 40))
 
-    if food:
-        coordinates_b = font.render(f"Food: х {food.x},у {food.y}", True, WHITE)
-        # screen.blit(coordinates_b, (810, 100))
+    if food1:
+        coordinates_b = font.render(f"Food: х {food1.x},у {food1.y}", True, WHITE)
+
     else:
         coordinates_b = font.render(f"None", True, WHITE)
     screen.blit(coordinates_b, (810, 100))
