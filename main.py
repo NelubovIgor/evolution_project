@@ -7,7 +7,7 @@ screen = pygame.display.set_mode((WIDTH + SIDEBAR_WIDTH, HEIGHT))  # Созда�
 
 clock = pygame.time.Clock()
 
-paused = False
+paused = True
 
 # make_objects()
 
@@ -23,21 +23,22 @@ while True:
         paused = not paused
 
     if not paused:
-        Player.move_player(player1, pressed)
+        if player1:
+            Player.move_player(player1, pressed)
         cycle += 1
 
         world.world_life()
 
     #отрисовка
-    
+
     screen.fill(BLACK)
 
     for c, b in world.bodies.items():
         pygame.draw.circle(screen, b.color, (c[0], c[1]), b.size)
 
-    pygame.draw.circle(screen, player1.color, (player1.x, player1.y), player1.size)
+    if player1:
+        pygame.draw.circle(screen, player1.color, (player1.x, player1.y), player1.size)
     
-
     pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
 
     # Отображение количества циклов
@@ -46,10 +47,16 @@ while True:
     screen.blit(cycle_text, (810, 20))
 
     #координаты игрока
-    coordinates = font.render(f"Player: х {player1.x},у {player1.y}", True, WHITE)
-    screen.blit(coordinates, (810, 40))
+    if player1:
+        coordinates = font.render(f"Player: х {player1.x},у {player1.y}", True, WHITE)
+        screen.blit(coordinates, (810, 40))
 
-
+    if food:
+        coordinates_b = font.render(f"Food: х {food.x},у {food.y}", True, WHITE)
+        # screen.blit(coordinates_b, (810, 100))
+    else:
+        coordinates_b = font.render(f"None", True, WHITE)
+    screen.blit(coordinates_b, (810, 100))
 
     coordinates_b = font.render(f"Bot: х {bot.x},у {bot.y}", True, WHITE)
     screen.blit(coordinates_b, (810, 60))
