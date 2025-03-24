@@ -18,7 +18,7 @@ if dir_y != 0:
     to_y = int(dir_y / dir_y) if dir_y > 0 else int((dir_y / dir_y) * -1)
 else:
     to_y = 0
-    
-print(to_y)
 
+# print(to_y)
+print(-10 / -5)
 # print(c)
