@@ -18,22 +18,21 @@ class Body:
         Body.all_bodies[(x, y)] = self
 
     def update_coordinates(self, new_crd):       
-        # print("old coord: ", self.x, self.y)
+
         Body.clear_body(self)
         Body.all_bodies[new_crd] = self
-        # print("new coord: ", self.x, self.y, new_crd)
+
 
     def do(self):
         self.energy -= 0.1
-        # obj = self.touch()
+
         touch = self.vision()
         print(touch)
         if not touch:
             obj = self.vision(self.visible)
         else:
             obj = touch
-        # print("touch: ", touch)
-        # print("obj: ", obj)
+
 
         if not obj and not self.memory:
             direction = tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y)))
@@ -79,12 +78,12 @@ class Body:
         for x in range(x_min, x_max):
             for y in range(y_min, y_max):
                 if (self.x == x and self.y == y) and 0 < x < WIDTH or 0 < y < HEIGHT:
-                    # print("pass")
+
                     continue
                 if (x - self.x) ** 2 + (y - self.y) ** 2 <= visible ** 2:
                     if (x, y) in Body.all_bodies:
                         objects.append(Body.all_bodies[(x, y)])
-        # print(objects)
+
         return objects
 
 

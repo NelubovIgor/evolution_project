@@ -6,6 +6,7 @@ FPS = 30
 
 CELL_SIZE = 1
 
+
 CYAN = (0, 128, 255)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
