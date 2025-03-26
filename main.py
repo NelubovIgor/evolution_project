@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 
 paused = True
 
-# make_objects()
+make_objects()
 
 while True:
     # Обработка событий

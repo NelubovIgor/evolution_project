@@ -15,11 +15,12 @@ class World:
                 obj.do()
             elif isinstance(obj, Grass):
                 obj.grow()
-
+            
     def new_body(self, obj):
         obj.id = self.next_id
         self.next_id += 1
         self.add_body(obj)
+        print(len(self.bodies))
 
     def add_body(self, obj):
         self.bodies[(obj.x, obj.y)] = obj
@@ -37,7 +38,7 @@ class World:
         min_x = 0 if obj.x - visible < 0 else obj.x - visible
         max_x = WIDTH if obj.x + visible > WIDTH else obj.x + visible + 1
         min_y = 0 if obj.y - visible < 0 else obj.y - visible
-        max_y = HEIGHT if obj.x + visible > HEIGHT else obj.x + visible + 1
+        max_y = HEIGHT if obj.y + visible > HEIGHT else obj.y + visible + 1
         return min_x, max_x, min_y, max_y
 
     def clear_body(self, obj):
@@ -54,9 +55,11 @@ class World:
 
         if distance <= radius_sum:
             self.clear_body(target)
+            return True
+        return False
 
 class Body:
-    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=20):
+    def __init__(self, x, y, birthday, color, energy=50, size=CELL_SIZE, visible=10, speed=1):
         self.x = x
         self.y = y
         self.color = color
@@ -65,6 +68,8 @@ class Body:
         self.size = size
         self.visible = visible
         self.memory = []
+        self.genome = []
+        self.speed = speed
         self.id = None
 
     def vision(self, visible=1):
@@ -82,8 +87,11 @@ class Body:
     
     def reproduction(self, place):
         self.energy /= 2
-        type_obj = self.__class__.__name__
-        pass
+        if isinstance(self, Animal):
+            world.new_body(Animal(place[0], place[1], cycle, energy=self.energy))
+        elif isinstance(self, Grass):
+
+            world.new_body(Grass(place[0], place[1], cycle, energy=self.energy))
 
     def sleep(self):
         pass
@@ -102,10 +110,15 @@ class Animal(Body):
             self.sleep()
             return
         
-        self.move(obj[0])
+        copy_obj = copy.copy(self)
+
+        target = random.choice(obj)
+        self.move(target)
+        world.collision(self, target)
+        world.update_coordinates(self, copy_obj)
         
     def move(self, target, to_target=True):
-        copy_obj = copy.copy(self)
+        
         dir_x = target.x - self.x
         dir_y = target.y - self.y
 
@@ -122,36 +135,37 @@ class Animal(Body):
         self.x += to_x
         self.y += to_y
 
-        world.collision(self, target)
-        world.update_coordinates(self, copy_obj)
 
 class Grass(Body):
-    def __init__(self, x, y, birthday, color=GREEN):
-        super().__init__(x, y, color, birthday)
+    def __init__(self, x, y, birthday, color=GREEN, energy=100):
+        super().__init__(x, y, birthday, color, energy)
 
     def grow(self):
         self.energy += 1
 
         if self.energy >= 100:
             min_x, max_x, min_y, max_y = World.borders(self)
-            while True:
+            count_step = 0
+            while count_step < 10:
+                count_step += 1
                 x = random.randint(min_x, max_x)
                 y = random.randint(min_y, max_y)
                 if (x, y) not in world.bodies:
                     self.reproduction((x, y))
+                    break
 
 
 class Predator(Animal):
     def __init__(self, x, y, birthday, color=RED):
-        super().__init__(x, y, color, birthday)
+        super().__init__(x, y, birthday, color)
 
 class Herbivore(Animal):
     def __init__(self, x, y, birthday, color=CYAN):
-        super().__init__(x, y, color, birthday)
+        super().__init__(x, y, birthday, color)
 
 class Player(Body):
     def __init__(self, x, y, birthday, color=BLUE):
-        super().__init__(x, y, color, birthday)
+        super().__init__(x, y, birthday, color)
 
     def move_player(self, pressed):
         copy_obj = copy.copy(self)
@@ -208,7 +222,7 @@ def make_objects():
         g = Grass(x, y, cycle)
         world.new_body(g)
 
-    for _ in range(5):
-        x, y = world.random_coordinates()
-        p = Predator(x, y, cycle)
-        world.new_body(p)
+    # for _ in range(5):
+    #     x, y = world.random_coordinates()
+    #     p = Predator(x, y, cycle)
+    #     world.new_body(p)
