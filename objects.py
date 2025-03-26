@@ -1,11 +1,62 @@
 import random, pygame, math
 from constants import *
+import copy
 
+class World:
+    def __init__(self):
+        self.bodies = {}
+        self.id_to_coords = {}
+        self.next_id = 0
+
+    def world_life(self):
+        copy_world = copy.copy(self.bodies)
+        for coord, obj in copy_world.items():
+            if isinstance(obj, Animal):
+                obj.do()
+            elif isinstance(obj, Grass):
+                obj.grow()
+
+    def new_body(self, obj):
+        obj.id = self.next_id
+        self.next_id += 1
+        self.add_body(obj)
+
+    def add_body(self, obj):
+        self.bodies[(obj.x, obj.y)] = obj
+        self.id_to_coords[obj.id] = (obj.x, obj.y)
+
+    def random_coordinates(self):
+        while True:
+            x = random.randint(0, WIDTH)
+            y = random.randint(0, HEIGHT)
+            if (x, y) not in self.bodies:
+                return x, y
+            
+    def borders(obj):
+        visible = obj.visible
+        min_x = 0 if obj.x - visible < 0 else obj.x - visible
+        max_x = WIDTH if obj.x + visible > WIDTH else obj.x + visible + 1
+        min_y = 0 if obj.y - visible < 0 else obj.y - visible
+        max_y = HEIGHT if obj.x + visible > HEIGHT else obj.x + visible + 1
+        return min_x, max_x, min_y, max_y
+
+    def clear_body(self, obj):
+        del self.bodies[(obj.x, obj.y)]
+        del self.id_to_coords[obj.id]
+
+    def update_coordinates(self, obj, old_obj):
+        self.clear_body(old_obj)
+        self.add_body(obj)
+
+    def collision(self, obj, target):
+        distance = math.hypot((target.x - obj.x) ** 2 + (target.y - obj.y) ** 2)
+        radius_sum = obj.size + target.size
+
+        if distance <= radius_sum:
+            self.clear_body(target)
 
 class Body:
-    all_bodies = {}
-
-    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=3):
+    def __init__(self, x, y, color, birthday, energy=100, size=CELL_SIZE, visible=20):
         self.x = x
         self.y = y
         self.color = color
@@ -14,145 +65,87 @@ class Body:
         self.size = size
         self.visible = visible
         self.memory = []
-        
-        Body.all_bodies[(x, y)] = self
+        self.id = None
 
-    def update_coordinates(self, new_crd):       
+    def vision(self, visible=1):
+        objects_around = []
 
-        Body.clear_body(self)
-        Body.all_bodies[new_crd] = self
+        min_x, max_x, min_y, max_y = World.borders(self)
 
+        for x in range(min_x, max_x):
+            for y in range(min_y, max_y):
+                if x == self.x and y == self.y:
+                    continue
+                if (x, y) in world.bodies:
+                    objects_around.append(world.bodies[(x, y)])
+        return objects_around
+    
+    def reproduction(self, place):
+        self.energy /= 2
+        type_obj = self.__class__.__name__
+        pass
+
+    def sleep(self):
+        pass
+
+class Animal(Body):
+    def __init__(self, x, y, birthday, color):
+        super().__init__(x, y, birthday, color)
 
     def do(self):
         self.energy -= 0.1
 
-        touch = self.vision()
-        print(touch)
-        if not touch:
+        obj = self.vision()
+        if not obj:
             obj = self.vision(self.visible)
-        else:
-            obj = touch
-
-
-        if not obj and not self.memory:
-            direction = tuple(a + b for a, b in zip(random.choice(list(DIRECTIONS.values())), (self.x, self.y)))
-            self.move(direction)
-            return
-        elif self.memory:
-            if len(self.memory) == 1:
-                self.memory.append(10)
-            self.memory[1] -= 1
-            self.move(None)
-            if self.memory[1] == 0:
-                self.memory.clear()
-            return
-
-        predators = [o for o in obj if o.__class__.__name__ == "Predator"]
-        herbivores = [o for o in obj if o.__class__.__name__ == "Herbivore"]
-        grasses = [o for o in obj if o.__class__.__name__ == "Grass"]
-        if predators:
-            pred = random.choice(predators)
-            self.move((pred.x, pred.y), False)
-        elif herbivores:
-            herb = random.choice(herbivores)
-            self.move((herb.x, herb.y), False)
-        elif grasses:
-            gras = random.choice(herbivores)
-            self.move((gras.x, gras.y))
-        else:
+        if not obj:
             self.sleep()
             return
         
-    def sleep(self):
-        pass
-
-    def vision(self, visible=1):
-        objects = []
-
-        x_min = int(self.x - visible)
-        x_max = int(self.x + visible) 
-        y_min = int(self.y - visible)
-        y_max = int(self.y + visible)
-
-        # Проходим по всем точкам в области
-        for x in range(x_min, x_max):
-            for y in range(y_min, y_max):
-                if (self.x == x and self.y == y) and 0 < x < WIDTH or 0 < y < HEIGHT:
-
-                    continue
-                if (x - self.x) ** 2 + (y - self.y) ** 2 <= visible ** 2:
-                    if (x, y) in Body.all_bodies:
-                        objects.append(Body.all_bodies[(x, y)])
-
-        return objects
-
-
+        self.move(obj[0])
+        
     def move(self, target, to_target=True):
-        if not target:
-            self.x += self.memory[0][0]
-            self.y += self.memory[0][1]
-            return
-        dx = target[0] - self.x
-        dy = target[1] - self.y
+        copy_obj = copy.copy(self)
+        dir_x = target.x - self.x
+        dir_y = target.y - self.y
 
-
-        direction_x = 0 if dx == 0 else dx // abs(dx)
-        direction_y = 0 if dy == 0 else dy // abs(dy)
-
-        self.memory.append((direction_x, direction_y))
-
-        if to_target:
-            self.x += direction_x
-            self.y += direction_y
+        if dir_x != 0:
+            to_x = int(dir_x / dir_x) if dir_x > 0 else int((dir_x / dir_x) * -1)
         else:
-            self.x -= direction_x
-            self.y -= direction_y
-        if 0 <= self.x <= WIDTH or 0 <= self.y <= HEIGHT:
-            self.memory.clear()
-        self.collision()
+            to_x = 0
 
-    def clear_body(self):
-        if (self.x, self.y) in Body.all_bodies:
-            # print(Body.all_bodies)
-            del Body.all_bodies[(self.x, self.y)]
+        if dir_y != 0:
+            to_y = int(dir_y / dir_y) if dir_y > 0 else int((dir_y / dir_y) * -1)
+        else:
+            to_y = 0
 
-    def random_coordinates():
-        while True:
-            x = random.randint(0, WIDTH)
-            y = random.randint(0, HEIGHT)
-            if (x, y) not in Body.all_bodies:
-                return x, y
+        self.x += to_x
+        self.y += to_y
 
-    def collision(self):
-        around = self.vision()
-        if around:
-            # print(around)
-            for obj in Body.all_bodies.keys():
-                # print(obj, self, sep='\n')
-                if obj != (self.x, self.y):
-                    distance = math.hypot(self.x - obj[0], self.y - obj[1])
-                    if distance < (self.size + Body.all_bodies[obj].size):
-                        # print(Body.all_bodies[obj].__class__.__name__)
-                        body_obj = Body.all_bodies[obj]
-                        name = body_obj.__class__.__name__ 
-                        if name == "Grass":
-                            grass_list.remove(body_obj)
-                        elif name == "Herbivore":
-                            herbivore_list.remove(body_obj)
-                        elif name == "Predator":
-                            predator_list.remove(body_obj)
-                        Body.clear_body(Body.all_bodies[obj])
-                        break
+        world.collision(self, target)
+        world.update_coordinates(self, copy_obj)
 
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN):
         super().__init__(x, y, color, birthday)
 
-class Predator(Body):
+    def grow(self):
+        self.energy += 1
+
+        if self.energy >= 100:
+            min_x, max_x, min_y, max_y = World.borders(self)
+            while True:
+                x = random.randint(min_x, max_x)
+                y = random.randint(min_y, max_y)
+                if (x, y) not in world.bodies:
+                    self.reproduction((x, y))
+
+
+class Predator(Animal):
     def __init__(self, x, y, birthday, color=RED):
         super().__init__(x, y, color, birthday)
 
-class Herbivore(Body):
+class Herbivore(Animal):
     def __init__(self, x, y, birthday, color=CYAN):
         super().__init__(x, y, color, birthday)
 
@@ -161,54 +154,61 @@ class Player(Body):
         super().__init__(x, y, color, birthday)
 
     def move_player(self, pressed):
+        copy_obj = copy.copy(self)
         speed = 1
         if pressed[pygame.K_w]:
-            self.update_coordinates((self.x, self.y - speed))
             self.y -= speed
         if pressed[pygame.K_s]:
-            self.update_coordinates((self.x, self.y + speed))
             self.y += speed
         if pressed[pygame.K_a]:
-            self.update_coordinates((self.x - speed, self.y))
             self.x -= speed
         if pressed[pygame.K_d]:
-            self.update_coordinates((self.x + speed, self.y))
-            self.x += speed    
-        self.collision()
+            self.x += speed
+        world.update_coordinates(self, copy_obj)
 
 cycle = 0
 
+world = World()
+play = False
+
 # создание объектов
-player1 = Player(20, 20, cycle)
+if play:
+    player1 = Player(200, 200, cycle)
+    world.new_body(player1)
+else:
+    player1 = None
 
-grass_list = []
-herbivore_list = []
-predator_list = []
+# food = (Grass(20, 21, cycle))
+# world.new_body(food)
 
-# grass_list.append(Grass(12, 12, cycle))
+food1 = (Grass(21, 20, cycle))
+world.new_body(food1)
 
-herbivore_list.append(Herbivore(12, 12, cycle))
+# food2 = (Grass(21, 21, cycle))
+# world.new_body(food2)
 
-# def grow():
-#     while not grass_list:
-#         grass_list.append(Grass(Body.random_coordinates()[0], Body.random_coordinates()[1], cycle))
+food = (Grass(34, 20, cycle))
+world.new_body(food)
+
+food3 = (Grass(44, 20, cycle))
+world.new_body(food3)
+
+food4 = (Grass(54, 20, cycle))
+world.new_body(food4)
+
+# bot = (Herbivore(20, 20, cycle))
+# world.new_body(bot)
+
+bot = (Herbivore(20, 20, cycle))
+world.new_body(bot)
 
 def make_objects():
-    for g in range(20):
-        x, y = Body.random_coordinates()
-        grass_list.append(Grass(x, y, cycle))
+    for _ in range(20):
+        x, y = world.random_coordinates()
+        g = Grass(x, y, cycle)
+        world.new_body(g)
 
-    # for h in range(5):
-    #     x, y = Body.random_coordinates()
-    #     herbivore_list.append(Herbivore(x, y, cycle))
-
-    for p in range(5):
-        x, y = Body.random_coordinates()
-        predator_list.append(Predator(x, y, cycle))
-
-
-make_objects()
-
-# print(Body.all_bodies[(12, 12)])
-
-# print(grass_list[0].__class__.__name__)
+    for _ in range(5):
+        x, y = world.random_coordinates()
+        p = Predator(x, y, cycle)
+        world.new_body(p)
