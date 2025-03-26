@@ -35,9 +35,9 @@ class World:
     def borders(obj):
         visible = obj.visible
         min_x = 0 if obj.x - visible < 0 else obj.x - visible
-        max_x = WIDTH if obj.x + visible > WIDTH else obj.x + visible
+        max_x = WIDTH if obj.x + visible > WIDTH else obj.x + visible + 1
         min_y = 0 if obj.y - visible < 0 else obj.y - visible
-        max_y = HEIGHT if obj.x + visible > HEIGHT else obj.x + visible
+        max_y = HEIGHT if obj.x + visible > HEIGHT else obj.x + visible + 1
         return min_x, max_x, min_y, max_y
 
     def clear_body(self, obj):
@@ -72,8 +72,8 @@ class Body:
 
         min_x, max_x, min_y, max_y = World.borders(self)
 
-        for x in range(min_x, max_x + 1):
-            for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x):
+            for y in range(min_y, max_y):
                 if x == self.x and y == self.y:
                     continue
                 if (x, y) in world.bodies:
