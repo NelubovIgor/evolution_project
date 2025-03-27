@@ -9,7 +9,8 @@ clock = pygame.time.Clock()
 
 paused = True
 
-make_objects()
+
+# make_objects()
 
 while True:
     # Обработка событий
@@ -25,12 +26,9 @@ while True:
     if not paused:
         if player1:
             Player.move_player(player1, pressed)
-        cycle += 1
-
         world.world_life()
 
     #отрисовка
-
     screen.fill(BLACK)
 
     for c, b in world.bodies.items():
@@ -43,26 +41,30 @@ while True:
 
     # Отображение количества циклов
     font = pygame.font.SysFont("Arial", 18)
-    cycle_text = font.render(f"Цикл: {cycle}", True, WHITE)
+    cycle_text = font.render(f"Cycle: {world.cycle}", True, WHITE)
     screen.blit(cycle_text, (810, 20))
+    len_bot = font.render(f"the number of bots: {len(world.bodies)}", True, WHITE)
+    screen.blit(len_bot, (810, 120))
 
-    #координаты игрока
+    # координаты игрока
     if player1:
         coordinates = font.render(f"Player: х {player1.x},у {player1.y}", True, WHITE)
         screen.blit(coordinates, (810, 40))
 
+    # координаты еды
     if food1:
         coordinates_b = font.render(f"Food: х {food1.x},у {food1.y}", True, WHITE)
-
     else:
         coordinates_b = font.render(f"None", True, WHITE)
+
     screen.blit(coordinates_b, (810, 100))
 
-    coordinates_b = font.render(f"Bot: х {bot.x},у {bot.y}", True, WHITE)
-    screen.blit(coordinates_b, (810, 60))
+    if bot:
+        coordinates_c = font.render(f"Bot: х {bot.x},у {bot.y}", True, WHITE)
+        screen.blit(coordinates_c, (810, 60))
 
-    energy_b = font.render(f"Bot energy: {bot.energy}", True, WHITE)
-    screen.blit(energy_b, (810, 80))
+        energy_b = font.render(f"Bot energy: {bot.energy}", True, WHITE)
+        screen.blit(energy_b, (810, 80))
 
     pygame.display.flip()
 

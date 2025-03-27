@@ -1,13 +1,13 @@
 import random
 from constants import *
+from abc import ABC, abstractmethod
 
-num = 12
-while True:
-    answer_num = int('2' + str(num)[1:-1])
-    print(num)
-    if num * 2 == answer_num:
-        print(answer_num) 
-        break
-    num += 10
+class AbstractClass(ABC):
+    @abstractmethod
+    def method(self):
+        return 1
 
-# print(str(num)[1:-1])
+
+obj = AbstractClass()
+
+print(obj.method())
