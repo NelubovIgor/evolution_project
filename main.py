@@ -39,7 +39,7 @@ while True:
     
     pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
 
-    # Отображение количества циклов
+    # Отображение количества цикловer
     font = pygame.font.SysFont("Arial", 18)
     cycle_text = font.render(f"Cycle: {world.cycle}", True, WHITE)
     screen.blit(cycle_text, (810, 20))

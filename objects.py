@@ -19,16 +19,18 @@ class World:
 
     def world_life(self):
         self.cycle += 1
-        logger.debug(f"the start of cycle {self.cycle}")
+        logger.debug(f"the start of cycle {self.cycle}\ncounter objects-{len(self.bodies)}")
         copy_world = copy.copy(self.bodies)
         for obj in copy_world.values():
             if isinstance(obj, Animal):
+                logger.info(f"do for id-{obj.id}")
                 obj.do()
             elif isinstance(obj, Grass):
                 obj.grow()
             
     def new_body(self, obj):
         obj.id = self.next_id
+        logger.info(f"new body id-{obj.id}, coordinates-{(obj.x, obj.y)}")
         self.next_id += 1
         self.add_body(obj)
 
@@ -52,13 +54,14 @@ class World:
         return min_x, max_x, min_y, max_y
 
     def clear_body(self, obj):
-        id = obj.id
-        del self.bodies[(obj.x, obj.y)]
-        del self.id_to_coords[id]
+        coord = (obj.x, obj.y)
+        id_obj = obj.id
+        logger.info(f"clear body id-{id_obj}, coordinates-{coord}")
+        del self.bodies[coord]
+        del self.id_to_coords[id_obj]
 
     def update_coordinates(self, obj, old_obj):
-        if (obj.x, obj.y) in self.bodies: 
-            self.clear_body(old_obj)
+        self.clear_body(old_obj)
         self.add_body(obj)
 
     def collision(self, obj, target):
@@ -129,6 +132,7 @@ class Animal(Body):
                 obj = self.vision()
                 if not obj:
                     obj = self.vision(self.visible)
+                    obj = list(x for x in obj if isinstance(x, Grass))
                 if not obj:
                     if not self.memory:
                         logger.info("start memory")
@@ -146,7 +150,9 @@ class Animal(Body):
                         self.move(self.memory)
                         world.update_coordinates(self, copy_obj)
 
+                
                 if obj:
+                    
                     self.memory = ()
                     logger.info("see target")
                     target = random.choice(obj)
