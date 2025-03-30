@@ -12,30 +12,32 @@ logger = logging.getLogger(__name__)
 class World:
     def __init__(self):
         self.bodies = {}
-        self.id_to_coords = {}
+        self.id_to_coords = dict()
         self.next_id = 0
         self.cycle = 0
         logger.info("the world is initialized")
 
     def world_life(self):
         self.cycle += 1
-        logger.debug(f"the start of cycle {self.cycle}\ncounter objects-{len(self.bodies)}")
+        logger.debug(f"the start of cycle {self.cycle} counter objects-{len(self.bodies)}")
         copy_world = copy.copy(self.bodies)
         for obj in copy_world.values():
             if isinstance(obj, Animal):
                 logger.info(f"do for id-{obj.id}")
                 obj.do()
             elif isinstance(obj, Grass):
+                # logger.info(f"grow for id-{obj.id}")
                 obj.grow()
             
     def new_body(self, obj):
         obj.id = self.next_id
-        logger.info(f"new body id-{obj.id}, coordinates-{(obj.x, obj.y)}")
+        logger.info(f"new body {obj.__class__} id-{obj.id}, coordinates-{(obj.x, obj.y)}")
         self.next_id += 1
         self.add_body(obj)
 
 
     def add_body(self, obj):
+        logger.info(f"add body {obj.__class__} id-{obj.id}, coordinates-{(obj.x, obj.y)}")
         self.bodies[(obj.x, obj.y)] = obj
         self.id_to_coords[obj.id] = (obj.x, obj.y)
 
@@ -56,22 +58,25 @@ class World:
     def clear_body(self, obj):
         coord = (obj.x, obj.y)
         id_obj = obj.id
-        logger.info(f"clear body id-{id_obj}, coordinates-{coord}")
+        logger.info(f"clear body {obj.__class__} id-{id_obj}, coordinates-{coord}")
         del self.bodies[coord]
         del self.id_to_coords[id_obj]
 
     def update_coordinates(self, obj, old_obj):
+        logger.info(f"update coordinates {obj.__class__} id-{obj.id} from {obj.x, obj.y} to {old_obj.x, old_obj.y}")
         self.clear_body(old_obj)
         self.add_body(obj)
 
     def collision(self, obj, target):
+        
         distance = math.hypot((target.x - obj.x) ** 2 + (target.y - obj.y) ** 2)
         radius_sum = obj.size + target.size
 
         if distance <= radius_sum:
+            logger.info(f"collision from {obj.__class__} id-{obj.id}  x-{obj.x} y-{obj.y} to {target.__class__} id-{target.id} x-{target.x} y-{target.y}")
             energy = target.energy
             self.clear_body(target)
-            # print(energy)
+
             return energy
         return False
 
@@ -132,30 +137,17 @@ class Animal(Body):
                 obj = self.vision()
                 if not obj:
                     obj = self.vision(self.visible)
-                    obj = list(x for x in obj if isinstance(x, Grass))
                 if not obj:
-                    if not self.memory:
-                        logger.info("start memory")
-                        min_x, max_x, min_y, max_y = World.borders(self, self.visible)
-                        x = random.randint(min_x, max_x)
-                        y = random.randint(min_y, max_y)
-                        self.memory = (x, y)
-                        self.move(self.memory)
-                        world.update_coordinates(self, copy_obj)
-                    elif self.memory == (self.x, self.y):
-                        logger.info("clear memory")
-                        self.memory = ()
-                    elif self.memory:
-                        logger.info("move memory")
-                        self.move(self.memory)
-                        world.update_coordinates(self, copy_obj)
-
+                    self.memory_func(copy_obj)
                 
                 if obj:
-                    
+                    obj = list(x for x in obj if isinstance(x, Grass))
+                    if not obj:
+                        self.memory_func(copy_obj)
+                        return
                     self.memory = ()
-                    logger.info("see target")
                     target = random.choice(obj)
+                    logger.info(f"see target: {target.__class__}")
                     self.move((target.x, target.y))
                     eat = world.collision(self, target)
                     if eat:
@@ -182,6 +174,23 @@ class Animal(Body):
         else:
             self.x -= to_x
             self.y -= to_y
+
+    def memory_func(self, copy_obj):
+        if not self.memory:
+            logger.info("start memory")
+            min_x, max_x, min_y, max_y = World.borders(self, self.visible)
+            x = random.randint(min_x, max_x)
+            y = random.randint(min_y, max_y)
+            self.memory = (x, y)
+            self.move(self.memory)
+            world.update_coordinates(self, copy_obj)
+        elif self.memory == (self.x, self.y):
+            logger.info("clear memory")
+            self.memory = ()
+        elif self.memory:
+            logger.info("move memory")
+            self.move(self.memory)
+            world.update_coordinates(self, copy_obj)
 
 class Grass(Body):
     def __init__(self, x, y, birthday, color=GREEN, energy=100):
