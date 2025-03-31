@@ -5,6 +5,7 @@ import copy
 # Настройка логирования
 logging.basicConfig(
     filename="simulation.log", level=logging.DEBUG,
+    filemode="w",
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
@@ -118,8 +119,8 @@ class Body:
         pass
 
 class Animal(Body):
-    def __init__(self, x, y, birthday, color, energy):
-        super().__init__(x, y, birthday, color, energy)
+    def __init__(self, x, y, birthday, color, energy, visible, size):
+        super().__init__(x, y, birthday, color, energy, visible, size)
 
     def do(self):
         if self.energy <= 0:
@@ -193,13 +194,13 @@ class Animal(Body):
             world.update_coordinates(self, copy_obj)
 
 class Grass(Body):
-    def __init__(self, x, y, birthday, color=GREEN, energy=100):
-        super().__init__(x, y, birthday, color, energy)
+    def __init__(self, x, y, birthday, color=GREEN, energy=50, size=1, visible=100):
+        super().__init__(x, y, birthday, color, energy, size, visible)
 
     def grow(self):
         self.energy += 1
 
-        if self.energy >= 100:
+        if self.energy >= 300:
             min_x, max_x, min_y, max_y = World.borders(self, self.visible)
             count_step = 0
             while count_step < 3:
@@ -216,8 +217,8 @@ class Predator(Animal):
         super().__init__(x, y, birthday, color)
 
 class Herbivore(Animal):
-    def __init__(self, x, y, birthday, color=CYAN, energy=100):
-        super().__init__(x, y, birthday, color, energy)
+    def __init__(self, x, y, birthday, color=CYAN, energy=100, size=CELL_SIZE, visible=10):
+        super().__init__(x, y, birthday, color, energy, size, visible)
 
 class Player(Body):
     def __init__(self, x, y, birthday, color=BLUE):
@@ -249,14 +250,20 @@ play = False
 if play:
     player1 = Player(200, 200, world.cycle)
     world.new_body(player1)
+
+    bot = (Herbivore(20, 20, world.cycle))
+    world.new_body(bot)
+
+    food1 = (Grass(61, 20, world.cycle))
+    world.new_body(food1)
 else:
     player1 = None
+    bot = None
+    food1 = None
 
-food = (Grass(30, 21, world.cycle))
-world.new_body(food)
+# food = (Grass(30, 21, world.cycle))
+# world.new_body(food)
 
-food1 = (Grass(61, 20, world.cycle))
-world.new_body(food1)
 
 # food2 = (Grass(21, 21, cycle))
 # world.new_body(food2)
@@ -273,14 +280,18 @@ world.new_body(food1)
 # bot = (Herbivore(20, 20, cycle))
 # world.new_body(bot)
 
-bot = (Herbivore(20, 20, world.cycle))
-world.new_body(bot)
+
 
 def make_objects():
     for _ in range(20):
         x, y = world.random_coordinates()
         g = Grass(x, y, world.cycle)
         world.new_body(g)
+
+    for _ in range(5):
+        x, y = world.random_coordinates()
+        h = Herbivore(x, y, world.cycle)
+        world.new_body(h)
 
     # for _ in range(5):
     #     x, y = world.random_coordinates()
