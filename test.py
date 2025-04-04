@@ -7,4 +7,4 @@ def draw_graph(f):
         for y in range(12):
             print(x, end="")
 
-draw_graph(lambda x: x)
+draw_graph(lambda x: x * 1)
