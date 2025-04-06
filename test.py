@@ -8,3 +8,5 @@ def draw_graph(f):
             print(x, end="")
 
 draw_graph(lambda x: x * 1)
+
+print('solution ',2500 * 2026 - 2025 * 2620)
