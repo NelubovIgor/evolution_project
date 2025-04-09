@@ -48,6 +48,14 @@ def draw_graph1(f):
             print(point_x, point_y)
 
 # draw_graph1(lambda x: 2)
-draw_graph(lambda x: x * 1)
+# draw_graph(lambda x: x * 1)
 
+def equation_of_line(values):
+    k = (1 - 0) / (values[0] - values[1])
+    b = (0 * values[1] - values[0] * 1) / (values[0] - values[1])
+    for y, x in enumerate(values):
+        if y < 2:
+            continue
+        return float(y) == k * x + b
 
+print(equation_of_line([0, 1, 2, 3, 4]))
