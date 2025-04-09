@@ -2,13 +2,52 @@ import random
 from constants import *
 
 def draw_graph(f):
-    for x in range(13):
-        print('------')
-        for y in range(12):
-            print(x, end="")
+    for y in range(12):
+        print()
+        for x in range(13):
+            if x == 0:
+                if y == 0:
+                    print('y', end="")
+                elif 0 < y < 10:
+                    print(10 - y, end="")
+                else:
+                    print(' ', end="")
+            elif x == 1:
+                if y == 0:
+                    print(' ^ ', end="")
+                elif 0 < y < 10:
+                    print(' | ', end="")
+                elif y == 10:
+                    print(' +-', end="")
+                else:
+                    print('   ', end="")
+            elif y == 10:
+                if 1 < x < 10:
+                    print('---', end="")
+                elif x == 10:
+                    print('--', end="")
+                elif x == 11:
+                    print(' >', end="")
+                elif x == 12:
+                    print(' x', end="")
+            elif y == 11:
+                if 1 < x < 11:
+                    print(f" {x - 1} ", end="")
+            elif 1 < x < 11 and 0 < y < 10:
+                point_x = f(x-1)
+                point_y = 10 - y
+                if point_x == point_y:
+                    print(' * ', end="")
 
-# draw_graph(lambda x: x * 1)
+def draw_graph1(f):
+    for y in range(12):
+        print()
+        for x in range(13):
+            point_x = f(x)
+            point_y = f(y)
+            print(point_x, point_y)
 
-print(-16 / -5)
-x = 7
-print(4 * (x - 1) + 3 * x - 3 == 7 * (x - 1))
+# draw_graph1(lambda x: 2)
+draw_graph(lambda x: x * 1)
+
+
