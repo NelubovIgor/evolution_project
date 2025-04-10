@@ -1,61 +1,31 @@
-import random
+import random, math
 from constants import *
 
-def draw_graph(f):
-    for y in range(12):
-        print()
-        for x in range(13):
-            if x == 0:
-                if y == 0:
-                    print('y', end="")
-                elif 0 < y < 10:
-                    print(10 - y, end="")
-                else:
-                    print(' ', end="")
-            elif x == 1:
-                if y == 0:
-                    print(' ^ ', end="")
-                elif 0 < y < 10:
-                    print(' | ', end="")
-                elif y == 10:
-                    print(' +-', end="")
-                else:
-                    print('   ', end="")
-            elif y == 10:
-                if 1 < x < 10:
-                    print('---', end="")
-                elif x == 10:
-                    print('--', end="")
-                elif x == 11:
-                    print(' >', end="")
-                elif x == 12:
-                    print(' x', end="")
-            elif y == 11:
-                if 1 < x < 11:
-                    print(f" {x - 1} ", end="")
-            elif 1 < x < 11 and 0 < y < 10:
-                point_x = f(x-1)
-                point_y = 10 - y
-                if point_x == point_y:
-                    print(' * ', end="")
+def quadratic_intersections(a1, b1, c1, a2, b2, c2):
+    points = set()
+    a = a1 - a2
+    b = b1 - b2
+    c = c1 - c2
+    d = b ** 2 - 4 * a * c
+    x1 = None
+    x2 = None
+    if d >= 0 and a != 0:
+        x1 = (-b - math.sqrt(d)) / (2 * a)
+        if d > 0:
+            x2 = (-b + math.sqrt(d)) / (2 * a)
+    if x1 != None:
+        y1 = a1 * x1 ** 2 + b1 * x1 + c1
+        points.add((x1, y1))
+        if x2 != None:
+            y2 = a2 * x2 ** 2 + b2 * x2 + c2
+            points.add((x2, y2))
+    if a == 0 and b != 0:
+        x = -(c / b)
+        y = a * x ** 2 + b * x + c
+        points.add((x, y))
+    return points
 
-def draw_graph1(f):
-    for y in range(12):
-        print()
-        for x in range(13):
-            point_x = f(x)
-            point_y = f(y)
-            print(point_x, point_y)
+# print(quadratic_intersections(1, 2, 3, 1, 1, 4))
 
-# draw_graph1(lambda x: 2)
-# draw_graph(lambda x: x * 1)
-
-def equation_of_line(values):
-    k = (1 - 0) / (values[0] - values[1])
-    b = (0 * values[1] - values[0] * 1) / (values[0] - values[1])
-    for y, x in enumerate(values):
-        if y < 2:
-            continue
-        return float(y) == k * x + b
-
-print(equation_of_line([0, 1, 2, 3, 4]))
+d = 2024 ** 2 - 4 * 1 * -2025
+print((2024 + d ** 0.5) / 2 * 1)

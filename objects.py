@@ -293,7 +293,7 @@ def make_objects():
         h = Herbivore(x, y, world.cycle)
         world.new_body(h)
 
-    # for _ in range(5):
-    #     x, y = world.random_coordinates()
-    #     p = Predator(x, y, cycle)
-    #     world.new_body(p)
+    for _ in range(5):
+        x, y = world.random_coordinates()
+        p = Predator(x, y, world.cycle)
+        world.new_body(p)
