@@ -66,3 +66,9 @@ p1 = (1, 1, 1, 1)                # P1(x) = x^3 + x^2 + x + 1
 p2 = (-1, -1, -1, -1, -1)        # P2(x) = -x^4 - x^3 - x^2 - x - 1
 
 print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = -x^4
+
+nums = [(1-(1/n**2)) for n in range(2, 11)]
+result = 1
+for n in nums:
+    result *= n
+print(result)    
