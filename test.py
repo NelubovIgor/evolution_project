@@ -1,4 +1,4 @@
-import random, math
+import random, math, itertools
 from constants import *
 
 def quadratic_intersections(a1, b1, c1, a2, b2, c2):
@@ -27,5 +27,42 @@ def quadratic_intersections(a1, b1, c1, a2, b2, c2):
 
 # print(quadratic_intersections(1, 2, 3, 1, 1, 4))
 
-d = 2024 ** 2 - 4 * 1 * -2025
-print((2024 + d ** 0.5) / 2 * 1)
+def polynomial_sum(p1, p2):
+    pp = {}
+    result = list()
+    def intermediate_result(p):
+        for i, n in enumerate(reversed(p)):
+            if i not in pp:
+                pp[i] = n
+            else:
+                pp[i] += n
+    intermediate_result(p1)
+    intermediate_result(p2)
+    # print(pp)
+    for degree, num in pp.items():
+        # if (degree == 0 or degree == 1) and num == 0:
+        #     continue
+
+        result.append(num)
+
+    return tuple(reversed(result))
+
+p1 = (2, -4, 5)                  # P1(x) = 2x^2 - 4x + 5
+p2 = (3, 2)                      # P2(x) = 3x + 2
+
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = 2x^2 - x + 7
+
+p1 = (1, 7, 0, -4)               # P1(x) = x^3 + 7x^2 - 4
+p2 = (-1, 0, 0, 2)               # P2(x) = -x^3 + 2
+
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = 7x^2 - 2
+
+p1 = (1, 2, 3, 4, 5)             # P1(x) = x^4 + 2x^3 + 3x^2 + 4x + 5
+p2 = (1,)                        # P2(x) = 1
+
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = x^4 + 2x^3 + 3x^2 + 4x + 6
+
+p1 = (1, 1, 1, 1)                # P1(x) = x^3 + x^2 + x + 1
+p2 = (-1, -1, -1, -1, -1)        # P2(x) = -x^4 - x^3 - x^2 - x - 1
+
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = -x^4
