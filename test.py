@@ -31,44 +31,43 @@ def intersections(a, b, c, k, m):
 
 
 def polynomial_sum(p1, p2):
-    pp = {}
-    result = list()
-    def intermediate_result(p):
-        for i, n in enumerate(reversed(p)):
-            if i not in pp:
-                pp[i] = n
-            else:
-                pp[i] += n
-    intermediate_result(p1)
-    intermediate_result(p2)
-    # print(pp)
-    for degree, num in pp.items():
-        # if (degree == 0 or degree == 1) and num == 0:
-        #     continue
+    p_degree = {k: v for k, v in enumerate(reversed(p1))}
+    for k, v in enumerate(reversed(p2)):
+        if k in p_degree.items(): p_degree[k] += v
+        else: p_degree[k] = v
+        
+    # p2_degree = {k: v for k, v in enumerate(reversed(p2))}
+    # result = list()
+    # ren = len(p1_degree) if len(p1_degree) > len(p2_degree) else len(p2_degree)
+    # for i in range(ren):
+    #     first = p1_degree.get(i, 0)
+    #     second = p2_degree.get(i, 0)
+    #     if first == 0 and second == 0: continue
+    #     result.append(first + second)
+    # final = list()
 
-        result.append(num)
 
-    return tuple(reversed(result))
 
-# p1 = (2, -4, 5)                  # P1(x) = 2x^2 - 4x + 5
-# p2 = (3, 2)                      # P2(x) = 3x + 2
+p1 = (2, -4, 5)                  # P1(x) = 2x^2 - 4x + 5
+p2 = (3, 2)                      # P2(x) = 3x + 2
 
-# print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = 2x^2 - x + 7
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = 2x^2 - x + 7
 
-# p1 = (1, 7, 0, -4)               # P1(x) = x^3 + 7x^2 - 4
-# p2 = (-1, 0, 0, 2)               # P2(x) = -x^3 + 2
+p1 = (1, 7, 0, -4)               # P1(x) = x^3 + 7x^2 - 4
+p2 = (-1, 0, 0, 2)               # P2(x) = -x^3 + 2
 
-# print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = 7x^2 - 2
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = 7x^2 - 2
 
-# p1 = (1, 2, 3, 4, 5)             # P1(x) = x^4 + 2x^3 + 3x^2 + 4x + 5
-# p2 = (1,)                        # P2(x) = 1
+p1 = (1, 2, 3, 4, 5)             # P1(x) = x^4 + 2x^3 + 3x^2 + 4x + 5
+p2 = (1,)                        # P2(x) = 1
 
-# print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = x^4 + 2x^3 + 3x^2 + 4x + 6
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = x^4 + 2x^3 + 3x^2 + 4x + 6
 
-# p1 = (1, 1, 1, 1)                # P1(x) = x^3 + x^2 + x + 1
-# p2 = (-1, -1, -1, -1, -1)        # P2(x) = -x^4 - x^3 - x^2 - x - 1
+p1 = (1, 1, 1, 1)                # P1(x) = x^3 + x^2 + x + 1
+p2 = (-1, -1, -1, -1, -1)        # P2(x) = -x^4 - x^3 - x^2 - x - 1
 
-# print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = -x^4
+print(polynomial_sum(p1, p2))    # P1(x) + P2(x) = -x^4
+
 
 def time_zone(h, a, b):
     difference = 0
@@ -76,10 +75,10 @@ def time_zone(h, a, b):
     elif a < b: difference = b - a
     if difference == h: return 0
     else: difference += h
-    if 23 > difference: return difference
-    else: return difference % 23
+    if 24 > difference: return difference
+    else: return difference % 24
 
-print(time_zone(12, 3, 7))
-print(time_zone(6, -11, 12))
-print(time_zone(23, 12, -11))
-print(time_zone(11, 12, -11))
+# print(time_zone(12, 3, 7))
+# print(time_zone(6, -11, 12))
+# print(time_zone(23, 12, -11))
+# print(time_zone(11, 12, -11))
