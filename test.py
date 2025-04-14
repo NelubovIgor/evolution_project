@@ -36,15 +36,7 @@ def polynomial_sum(p1, p2):
         if k in p_degree.items(): p_degree[k] += v
         else: p_degree[k] = v
         
-    # p2_degree = {k: v for k, v in enumerate(reversed(p2))}
-    # result = list()
-    # ren = len(p1_degree) if len(p1_degree) > len(p2_degree) else len(p2_degree)
-    # for i in range(ren):
-    #     first = p1_degree.get(i, 0)
-    #     second = p2_degree.get(i, 0)
-    #     if first == 0 and second == 0: continue
-    #     result.append(first + second)
-    # final = list()
+
 
 
 
