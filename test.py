@@ -35,6 +35,7 @@ def polynomial_sum(p1, p2):
     for k, v in enumerate(reversed(p2)):
         if k in p_degree.items(): p_degree[k] += v
         else: p_degree[k] = v
+        print("i can!")
     return p_degree
 
 
