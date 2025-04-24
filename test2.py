@@ -4,7 +4,11 @@ def snake(n):
 # snake(3)
 
 
-def mystery(nums):
-    return sum([n for n in range(1, nums + 1)])
+def mystery(n):
+    donats = 0
+    for s in str(n):
+        if s == "6" or s == "9" or s == "0": donats += 1
+        elif s == "8": donats += 2    
+    return donats
 
-print(mystery(10))
+print(mystery(80))
