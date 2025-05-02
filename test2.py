@@ -12,3 +12,4 @@ def mystery(n):
     return donats
 
 print(mystery(88))
+print(10 / 6)
