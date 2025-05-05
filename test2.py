@@ -11,4 +11,6 @@ def mystery(n):
         elif s == "8": donats += 2    
     return donats
 
-print(mystery(8))
+# print(mystery(8))
+
+print(((1 - 3 ** 8) * 7) / 2)
