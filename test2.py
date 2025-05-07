@@ -1,7 +1,7 @@
-def snake(n):
-    print()
+from itertools import zip_longest
 
-# snake(3)
+def polynomial(p):
+    result = ''
+    return 
 
-
-
+print(polynomial((1, 3, -1, 1, -2)))
