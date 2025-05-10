@@ -6,6 +6,8 @@ def polynomial(p):
                 result += str(s) + "+"
             else:
                 result += str(abs(s)) + "-"
+        if 
+
     return result
 
 print(polynomial((1, 3, -1, 1, -2)))
