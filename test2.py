@@ -6,7 +6,11 @@ def polynomial(p):
                 result += str(s) + "+"
             else:
                 result += str(abs(s)) + "-"
-        if 
+        if i == 1 and s != 0:
+            if s > 0:
+                result += str(s) + "+"
+            else:
+                result += str(abs(s)) + "-"
 
     return result
 
