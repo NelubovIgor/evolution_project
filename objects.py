@@ -213,8 +213,8 @@ class Grass(Body):
 
 
 class Predator(Animal):
-    def __init__(self, x, y, birthday, color=RED):
-        super().__init__(x, y, birthday, color)
+    def __init__(self, x, y, birthday, color=RED, energy=100, size=CELL_SIZE, visible=10):
+        super().__init__(x, y, birthday, color, energy, size, visible)
 
 class Herbivore(Animal):
     def __init__(self, x, y, birthday, color=CYAN, energy=100, size=CELL_SIZE, visible=10):
