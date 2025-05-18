@@ -37,7 +37,7 @@ while True:
     if player1:
         pygame.draw.circle(screen, player1.color, (player1.x, player1.y), player1.size)
     
-    pygame.draw.rect(screen, WHITE, (800, 0, 1, HEIGHT))
+    pygame.draw.rect(screen, WHITE, (WIDTH, 0, 1, HEIGHT))
 
     # Отображение количества циклов
     font = pygame.font.SysFont("Arial", 18)
