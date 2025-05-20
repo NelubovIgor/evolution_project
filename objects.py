@@ -18,7 +18,6 @@ class World:
         self.cycle = 0
         logger.info("the world is initialized")
 
-
     def world_life(self):
         self.cycle += 1
         logger.debug(f"the start of cycle {self.cycle} counter objects-{len(self.bodies)}")
