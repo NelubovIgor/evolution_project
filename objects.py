@@ -242,7 +242,6 @@ class Player(Body):
             world.update_coordinates(self, copy_obj)
 
 
-
 world = World()
 play = False
 
